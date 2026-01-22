@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宏澜研究 | 首席经济学家洪灏宏观估值平台</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-main: #f8f9fc;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a68;
+            --text-muted: #8888a0;
+            --border: #e8e8f0;
+            --accent: #4f46e5;
+            --accent-light: #818cf8;
+            --us-color: #3b82f6;
+            --cn-color: #ef4444;
+            --up: #10b981;
+            --down: #ef4444;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .header {
+            background: var(--bg-card);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+        .header-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .data-source {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #f0f4ff;
+            border-radius: 4px;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--up);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .container { max-width: 1400px; margin: 0 auto; padding: 16px; }
+        .nav {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+        .nav-btn {
+            padding: 10px 18px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover { background: var(--bg-main); }
+        .nav-btn.active { background: var(--accent); color: white; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--bg-main);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .time-toggle {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-main);
+            padding: 4px;
+            border-radius: 6px;
+        }
+        .time-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .time-btn:hover { background: white; }
+        .time-btn.active { background: var(--accent); color: white; }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .metric-card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 14px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .metric-title { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+        .metric-country {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        .country-us { background: #eff6ff; color: var(--us-color); }
+        .country-cn { background: #fef2f2; color: var(--cn-color); }
+        .metric-value { font-size: 22px; font-weight: 700; color: var(--text-primary); margin: 6px 0; }
+        .metric-unit { font-size: 11px; color: var(--text-muted); margin-left: 2px; }
+        .metric-change { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+        .metric-arrow { font-weight: 700; }
+        .up { color: var(--up); }
+        .down { color: var(--down); }
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        .stock-card {
+            background: var(--bg-main);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .stock-card:hover { border-color: var(--accent); background: white; }
+        .stock-symbol { font-weight: 600; font-size: 13px; color: var(--text-primary); }
+        .stock-name { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .stock-price { font-size: 18px; font-weight: 700; margin: 8px 0 4px; }
+        .stock-change { font-size: 12px; font-weight: 500; }
+        .stock-pattern { font-size: 10px; padding: 3px 8px; border-radius: 4px; margin-top: 8px; display: inline-block; }
+        .pattern-buy { background: #dcfce7; color: #166534; }
+        .pattern-hold { background: #fef9c3; color: #854d0e; }
+        .pattern-sell { background: #fee2e2; color: #991b1b; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .data-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: var(--bg-main);
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        .data-table tbody tr:hover td { background: var(--bg-main); }
+        .data-table .num { font-family: 'SF Mono', Monaco, monospace; text-align: right; }
+        .source-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #f0f4ff;
+            color: var(--accent);
+            margin-left: 6px;
+        }
+        .chart-box { height: 280px; }
+        .chart-box-lg { height: 320px; }
+        .valuation-panel {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .valuation-item { text-align: center; padding: 14px; background: var(--bg-main); border-radius: 8px; }
+        .valuation-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+        .valuation-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+        .valuation-status { font-size: 10px; margin-top: 4px; padding: 2px 6px; border-radius: 3px; }
+        .status-cheap { background: #dcfce7; color: #166534; }
+        .status-fair { background: #fef9c3; color: #854d0e; }
+        .status-expensive { background: #fee2e2; color: #991b1b; }
+        .insight-list { padding: 0; }
+        .insight-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .insight-item:last-child { border-bottom: none; }
+        .insight-title { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 6px; }
+        .insight-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; align-items: center; }
+        .insight-sentiment { font-size: 10px; padding: 2px 8px; border-radius: 3px; }
+        .sentiment-bull { background: #dcfce7; color: #166534; }
+        .sentiment-bear { background: #fee2e2; color: #991b1b; }
+        .sentiment-neutral { background: #f3f4f6; color: #6b7280; }
+        .timeline { position: relative; padding-left: 20px; }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        .timeline-item { position: relative; padding-bottom: 16px; }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid white;
+        }
+        .timeline-date { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .timeline-content { font-size: 13px; color: var(--text-primary); }
+        .cycle-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .cycle-card { padding: 16px; background: var(--bg-main); border-radius: 8px; text-align: center; }
+        .cycle-name { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .cycle-period { font-size: 20px; font-weight: 700; color: var(--accent); }
+        .cycle-desc { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+        .heatmap {
+            display: grid;
+            grid-template-columns: auto repeat(5, 1fr);
+            gap: 2px;
+            font-size: 11px;
+        }
+        .heatmap-cell { padding: 8px; text-align: center; border-radius: 4px; }
+        .heatmap-header { background: var(--bg-main); font-weight: 600; color: var(--text-secondary); }
+        .heatmap-label { background: var(--bg-main); font-weight: 500; text-align: left; padding-left: 10px; }
+        .loading { display: flex; justify-content: center; align-items: center; height: 100px; color: var(--text-muted); }
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 1200px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .valuation-panel { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .grid-4, .grid-3, .grid-2, .cycle-cards { grid-template-columns: 1fr; }
+            .valuation-panel { grid-template-columns: repeat(2, 1fr); }
+            .header { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-mark">📈</div>
+            <span>宏澜研究</span>
+        </div>
+        <div class="header-info">
+            <div class="data-source">
+                <span>📊</span>
+                <span>数据来源: FRED | Yahoo Finance | 中国国家统计局</span>
+            </div>
+            <div class="status">
+                <div class="status-dot"></div>
+                <span id="updateTime">实时更新</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="nav">
+            <button class="nav-btn active" data-page="dashboard">仪表盘</button>
+            <button class="nav-btn" data-page="us-economy">美国经济</button>
+            <button class="nav-btn" data-page="cn-economy">中国经济</button>
+            <button class="nav-btn" data-page="stocks">股票行情</button>
+            <button class="nav-btn" data-page="valuation">估值分析</button>
+            <button class="nav-btn" data-page="indicators">指标对比</button>
+            <button class="nav-btn" data-page="honghao-special">洪灏专题</button>
+            <button class="nav-btn" data-page="insights">洪灏观点</button>
+            <button class="nav-btn" data-page="correlation">关联分析</button>
+        </nav>
+
+        <!-- 仪表盘页面 -->
+        <div id="dashboard" class="page active">
+            <div class="grid-4">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div><div class="metric-title">美国GDP环比折年率</div><span class="metric-country country-us">🇺🇸 美国</span></div>
+                    </div>
+                    <div class="metric-value" id="usGdp">--<span class="metric-unit">万亿美元</span></div>
+                    <div class="metric-change" id="usGdpChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div><div class="metric-title">美国CPI同比</div><span class="metric-country country-us">🇺🇸 美国</span></div>
+                    </div>
+                    <div class="metric-value" id="usCpi">--<span class="metric-unit">%</span></div>
+                    <div class="metric-change" id="usCpiChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div><div class="metric-title">联邦基金利率</div><span class="metric-country country-us">🇺🇸 美国</span></div>
+                    </div>
+                    <div class="metric-value" id="usFedRate">--<span class="metric-unit">%</span></div>
+                    <div class="metric-change" id="usFedRateChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div><div class="metric-title">美国失业率</div><span class="metric-country country-us">🇺🇸 美国</span></div>
+                    </div>
+                    <div class="metric-value" id="usUnemployment">--<span class="metric-unit">%</span></div>
+                    <div class="metric-change" id="usUnemploymentChange">--</div>
+                </div>
+            </div>
+            <div class="grid-4">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div><div class="metric-title">中国GDP同比</div><span class="metric-country country-cn">🇨🇳 中国</span></div>
+                    </div>
+                    <div class="metric-value" id="cnGdp">--<span class="metric-unit">%</span></div>
+                    <div class="metric-change" id="cnGdpChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div><div class="metric-title">中国CPI同比</div><span class="metric-country country-cn">🇨🇳 中国</span></div>
+                    </div>
+                    <div class="metric-value" id="cnCpi">--<span class="metric-unit">%</span></div>
+                    <div class="metric-change" id="cnCpiChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div><div class="metric-title">人民币汇率</div><span class="metric-country country-cn">🇨🇳 中国</span></div>
+                    </div>
+                    <div class="metric-value" id="cnyRate">--<span class="metric-unit">CNY/USD</span></div>
+                    <div class="metric-change" id="cnyRateChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div><div class="metric-title">中国制造业PMI</div><span class="metric-country country-cn">🇨🇳 中国</span></div>
+                    </div>
+                    <div class="metric-value" id="cnPmi">--</div>
+                    <div class="metric-change" id="cnPmiChange">--</div>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">📊</div>美国GDP vs CPI走势<span class="source-badge">FRED</span></div>
+                        <div class="time-toggle">
+                            <button class="time-btn" data-chart="usGdp" data-period="1y">1年</button>
+                            <button class="time-btn" data-chart="usGdp" data-period="5y">5年</button>
+                            <button class="time-btn active" data-chart="usGdp" data-period="10y">10年</button>
+                            <button class="time-btn" data-chart="usGdp" data-period="50y">50年</button>
+                        </div>
+                    </div>
+                    <div id="usGdpChart" class="chart-box"></div>
+</div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">💰</div>联邦基金利率 vs 失业率<span class="source-badge">FRED</span></div>
+                        <div class="time-toggle">
+                            <button class="time-btn" data-chart="usFed" data-period="1y">1年</button>
+                            <button class="time-btn" data-chart="usFed" data-period="5y">5年</button>
+                            <button class="time-btn active" data-chart="usFed" data-period="10y">10年</button>
+                            <button class="time-btn" data-chart="usFed" data-period="50y">50年</button>
+                        </div>
+                    </div>
+                    <div id="usFedChart" class="chart-box"></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">📈</div>热门股票<span class="source-badge">Yahoo Finance</span><span style="margin-left: auto; font-size: 11px; color: var(--text-muted);">每秒刷新</span></div>
+                </div>
+                <div class="stock-grid" id="stockPreview"></div>
+            </div>
+        </div>
+
+        <!-- 美国经济页面 -->
+        <div id="us-economy" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">🇺🇸</div>美国宏观经济数据明细<span class="source-badge">FRED</span></div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>指标名称</th><th>当前值</th><th>前值</th><th>环比变化</th><th>同比变化</th><th>数据频率</th><th>最新日期</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usEconomyTable"><tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr></tbody>
+                </table>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">📈</div>制造业PMI<span class="source-badge">FRED</span></div>
+                        <div class="time-toggle">
+                            <button class="time-btn" data-chart="pmi" data-period="1y">1年</button>
+                            <button class="time-btn" data-chart="pmi" data-period="5y">5年</button>
+                            <button class="time-btn active" data-chart="pmi" data-period="10y">10年</button>
+                            <button class="time-btn" data-chart="pmi" data-period="50y">50年</button>
+                        </div>
+                    </div>
+                    <div id="pmiChart" class="chart-box"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">💵</div>美元指数DXY<span class="source-badge">FRED</span></div>
+                        <div class="time-toggle">
+                            <button class="time-btn" data-chart="dxy" data-period="1y">1年</button>
+                            <button class="time-btn" data-chart="dxy" data-period="5y">5年</button>
+                            <button class="time-btn active" data-chart="dxy" data-period="10y">10年</button>
+                            <button class="time-btn" data-chart="dxy" data-period="50y">50年</button>
+                        </div>
+                    </div>
+                    <div id="dxyChart" class="chart-box"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中国经济页面 -->
+        <div id="cn-economy" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">🇨🇳</div>中国宏观经济数据明细<span class="source-badge">中国国家统计局</span></div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>指标名称</th><th>当前值</th><th>前值</th><th>环比变化</th><th>同比变化</th><th>数据频率</th><th>最新日期</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cnEconomyTable"><tr><td colspan="7" class="loading"><div class="spinner"></div></td></tr></tbody>
+                </table>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">📊</div>中国主要经济指标走势<span class="source-badge">Wind | 国家统计局</span></div>
+                    <div class="time-toggle">
+                        <button class="time-btn" data-chart="cnMacro" data-period="1y">1年</button>
+                        <button class="time-btn" data-chart="cnMacro" data-period="5y">5年</button>
+                        <button class="time-btn active" data-chart="cnMacro" data-period="10y">10年</button>
+                        <button class="time-btn" data-chart="cnMacro" data-period="30y">30年</button>
+                    </div>
+                </div>
+                <div id="cnMacroChart" class="chart-box-lg"></div>
+            </div>
+        </div>
+
+        <!-- 股票页面 -->
+        <div id="stocks" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">🇺🇸</div>NASDAQ 100成分股<span class="source-badge">Yahoo Finance</span></div>
+                </div>
+                <div class="stock-grid" id="nasdaqStocks"></div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">🇨🇳</div>富时A50成分股<span class="source-badge">东方财富</span></div>
+                </div>
+                <div class="stock-grid" id="a50Stocks"></div>
+            </div>
+        </div>
+
+        <!-- 估值分析页面 -->
+        <div id="valuation" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">📊</div>多维度估值指标<span class="source-badge">洪灏估值模型</span></div>
+                </div>
+                <div class="valuation-panel" id="valuationPanel">
+                    <div class="valuation-item">
+                        <div class="valuation-label">市盈率 (PE TTM)</div>
+                        <div class="valuation-value" id="peValue">--</div>
+                        <div class="valuation-status status-fair" id="peStatus">合理</div>
+                    </div>
+                    <div class="valuation-item">
+                        <div class="valuation-label">市净率 (PB)</div>
+                        <div class="valuation-value" id="pbValue">--</div>
+                        <div class="valuation-status status-fair" id="pbStatus">合理</div>
+                    </div>
+                    <div class="valuation-item">
+                        <div class="valuation-label">股息率</div>
+                        <div class="valuation-value" id="dividendValue">--</div>
+                        <div class="valuation-status status-fair" id="dividendStatus">合理</div>
+                    </div>
+                    <div class="valuation-item">
+                        <div class="valuation-label">CAPM预期收益</div>
+                        <div class="valuation-value" id="capmValue">--</div>
+                        <div class="valuation-status status-fair" id="capmStatus">合理</div>
+                    </div>
+                    <div class="valuation-item">
+                        <div class="valuation-label">估值综合评分</div>
+                        <div class="valuation-value" id="scoreValue">--</div>
+                        <div class="valuation-status status-fair" id="scoreStatus">合理</div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">📈</div>PE历史走势<span class="source-badge">Bloomberg</span></div>
+                        <div class="time-toggle">
+                            <button class="time-btn" data-chart="pe" data-period="1y">1年</button>
+                            <button class="time-btn" data-chart="pe" data-period="5y">5年</button>
+                            <button class="time-btn active" data-chart="pe" data-period="10y">10年</button>
+                            <button class="time-btn" data-chart="pe" data-period="50y">50年</button>
+                        </div>
+                    </div>
+                    <div id="peChart" class="chart-box"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">📊</div>估值分位<span class="source-badge">历史数据</span></div>
+                    </div>
+                    <div id="percentileChart" class="chart-box"></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">📋</div>详细估值数据</div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>市场/指数</th><th class="num">PE</th><th class="num">PB</th><th class="num">PS</th><th class="num">EV/EBITDA</th><th class="num">股息率(%)</th><th class="num">ROE(%)</th><th>估值状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="valuationTable"><tr><td colspan="8" class="loading"><div class="spinner"></div></td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 指标对比页面 -->
+        <div id="indicators" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">📊</div>中美欧日宏观指标对比<span class="source-badge">FRED | 中国国家统计局 | Eurostat | 日本统计局</span></div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>指标名称</th><th>🇺🇸 美国</th><th>🇨🇳 中国</th><th>🇪🇺 欧盟</th><th>🇯🇵 日本</th><th>数据频率</th><th>更新时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>GDP同比(%)</td><td class="num" id="gdp-us">2.8</td><td class="num" id="gdp-cn">4.6</td><td class="num" id="gdp-eu">0.8</td><td class="num" id="gdp-jp">1.2</td><td>季度</td><td>2025-01-15</td></tr>
+                        <tr><td>CPI同比(%)</td><td class="num" id="cpi-us">2.9</td><td class="num" id="cpi-cn">1.4</td><td class="num" id="cpi-eu">2.2</td><td class="num" id="cpi-jp">2.4</td><td>月度</td><td>2025-01-15</td></tr>
+                        <tr><td>制造业PMI</td><td class="num" id="pmi-us">49.3</td><td class="num" id="pmi-cn">50.1</td><td class="num" id="pmi-eu">46.6</td><td class="num" id="pmi-jp">49.0</td><td>月度</td><td>2025-01-15</td></tr>
+                        <tr><td>失业率(%)</td><td class="num" id="unemp-us">4.1</td><td class="num" id="unemp-cn">5.2</td><td class="num" id="unemp-eu">6.5</td><td class="num" id="unemp-jp">2.5</td><td>月度</td><td>2025-01-15</td></tr>
+                        <tr><td>央行利率(%)</td><td class="num" id="rate-us">4.25</td><td class="num" id="rate-cn">3.10</td><td class="num" id="rate-eu">4.50</td><td class="num" id="rate-jp">0.25</td><td>按需</td><td>2025-01-15</td></tr>
+                        <tr><td>10Y国债收益率(%)</td><td class="num" id="bond-us">4.65</td><td class="num" id="bond-cn">1.65</td><td class="num" id="bond-eu">2.35</td><td class="num" id="bond-jp">1.15</td><td>日度</td><td>2025-01-15</td></tr>
+                        <tr><td>货币供应M2同比(%)</td><td class="num" id="m2-us">1.2</td><td class="num" id="m2-cn">10.8</td><td class="num" id="m2-eu">3.5</td><td class="num" id="m2-jp">2.1</td><td>月度</td><td>2025-01-15</td></tr>
+                        <tr><td>零售销售同比(%)</td><td class="num" id="retail-us">3.5</td><td class="num" id="retail-cn">3.6</td><td class="num" id="retail-eu">0.8</td><td class="num" id="retail-jp">2.1</td><td>月度</td><td>2025-01-15</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">📈</div>洪灏周期指标：库存周期<span class="source-badge">洪灏方法论</span></div>
+                    </div>
+                    <div id="inventoryCycleChart" class="chart-box"></div>
+                    <div style="margin-top: 12px; padding: 12px; background: var(--bg-main); border-radius: 8px; font-size: 12px;">
+                        <strong>周期解读：</strong>当前处于基钦周期（库存周期）的主动去库存阶段向被动去库存过渡，预计2026年Q2进入主动补库存阶段。
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">💰</div>洪灏周期指标：信用周期<span class="source-badge">洪灏方法论</span></div>
+                    </div>
+                    <div id="creditCycleChart" class="chart-box"></div>
+                    <div style="margin-top: 12px; padding: 12px; background: var(--bg-main); border-radius: 8px; font-size: 12px;">
+                        <strong>周期解读：</strong>中国社会融资规模存量同比领先GDP约2个季度。当前信用扩张周期开启，预示经济将于2026年下半年企稳回升。
+                    </div>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">🔄</div>洪灏周期指标：美元周期<span class="source-badge">洪灏方法论</span></div>
+                    </div>
+                    <div id="dollarCycleChart" class="chart-box"></div>
+                    <div style="margin-top: 12px; padding: 12px; background: var(--bg-main); border-radius: 8px; font-size: 12px;">
+                        <strong>周期解读：</strong>美元周期约15-16年一轮，当前处于强势周期末期。美元见顶往往伴随新兴市场股市见底。
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">📊</div>洪灏周期指标：康波周期位置<span class="source-badge">洪灏方法论</span></div>
+                    </div>
+                    <div id="kondratievChart" class="chart-box"></div>
+                    <div style="margin-top: 12px; padding: 12px; background: var(--bg-main); border-radius: 8px; font-size: 12px;">
+                        <strong>周期解读：</strong>康德拉季耶夫周期（54年）显示，2025-2030年处于萧条期向复苏期过渡。数字经济将驱动新一轮技术革命。
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 洪灏专题页面 -->
+        <div id="honghao-special" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">📚</div>洪灏自媒体言论汇编<span class="source-badge">微博 | 微信公众号 | X平台</span></div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="time-btn active" data-view="summary">概要版</button>
+                        <button class="time-btn" data-view="full">完整版</button>
+                    </div>
+                </div>
+                <div id="honghao-summary">
+                    <div style="padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; color: white; margin-bottom: 16px;">
+                        <h3 style="margin-bottom: 8px;">🎯 洪灏核心观点概要</h3>
+                        <ul style="list-style: none; padding: 0; line-height: 1.8;">
+                            <li>✦ <strong>周期判断：</strong>2026年将迎来三重周期共振向上，是"改运逆命"的关键年份</li>
+                            <li>✦ <strong>市场观点：</strong>坚定看好中国资产，A股已处于技术性牛市</li>
+                            <li>✦ <strong>行业配置：</strong>数字经济、AI产业链、高端制造将是新一轮技术革命的赢家</li>
+                            <li>✦ <strong>风险提示：</strong>需关注美联储降息节奏、地缘政治风险</li>
+                            <li>✦ <strong>投资策略：</strong>逆向投资，在市场恐慌时布局</li>
+                        </ul>
+                    </div>
+                    <h4 style="margin: 20px 0 12px; font-size: 14px;">📅 关键时间节点预测</h4>
+                    <div class="timeline">
+                        <div class="timeline-item"><div class="timeline-date">2026 Q1</div><div class="timeline-content">美联储大概率降息，美元确认顶部</div></div>
+                        <div class="timeline-item"><div class="timeline-date">2026 Q2</div><div class="timeline-content">中国两会政策释放，经济企稳信号确认</div></div>
+                        <div class="timeline-item"><div class="timeline-date">2026 H2</div><div class="timeline-content">美国大选不确定性落地，全球风险偏好回升</div></div>
+                        <div class="timeline-item"><div class="timeline-date">2026年底</div><div class="timeline-content">康波周期拐点确认，数字经济驱动新一轮技术革命</div></div>
+                    </div>
+                </div>
+                <div id="honghao-full" style="display: none; max-height: 600px; overflow-y: auto;">
+                    <h4 style="margin-bottom: 16px; font-size: 14px;">📆 2026年1月</h4>
+                    <div class="insight-item">
+                        <div class="insight-title">中国首席经济学家论坛年会演讲</div>
+                        <div class="insight-meta"><span>2026-01-11</span><span>中国首席经济学家论坛</span></div>
+                        <p style="margin-top: 8px; line-height: 1.6; color: var(--text-secondary);">洪灏在年会上发表主旨演讲，指出2026年将为投资者带来"改运逆命"的机会。他强调三重周期将在2026年形成共振向上的局面。</p>
+                    </div>
+                    <h4 style="margin: 24px 0 16px; font-size: 14px;">📆 2024年12月</h4>
+                    <div class="insight-item">
+                        <div class="insight-title">"寻访金长江"活动访谈</div>
+                        <div class="insight-meta"><span>2024-12-20</span><span>长江证券</span></div>
+                        <p style="margin-top: 8px; line-height: 1.6; color: var(--text-secondary);">洪灏明确表示"A股已处于技术性牛市"，沪深300指数已形成典型的"杯柄"形态。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 洪灏观点页面 -->
+        <div id="insights" class="page">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">💡</div>洪灏最新观点</div>
+                    </div>
+                    <div class="insight-list">
+                        <div class="insight-item">
+                            <div class="insight-title">2026年将为投资者带来"改运逆命"的机会</div>
+                            <div class="insight-meta"><span>2026-01-11</span><span>中国首席经济学家论坛年会</span><span class="insight-sentiment sentiment-bull">看多</span></div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-title">A股已处于技术性牛市</div>
+                            <div class="insight-meta"><span>2024-12-20</span><span>寻访金长江</span><span class="insight-sentiment sentiment-bull">看多</span></div>
+                        </div>
+                        <div class="insight-item">
+                            <div class="insight-title">不看好美股但是看好A股</div>
+                            <div class="insight-meta"><span>2024-11-15</span><span>财经播客</span><span class="insight-sentiment sentiment-neutral">中性</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><div class="card-title-icon">📅</div>关键时间节点</div>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item"><div class="timeline-date">2026 Q1</div><div class="timeline-content">美联储利率决议 - 关注降息节奏</div></div>
+                        <div class="timeline-item"><div class="timeline-date">2026 Q2</div><div class="timeline-content">中国两会 - 关注政策刺激力度</div></div>
+                        <div class="timeline-item"><div class="timeline-date">2026 H2</div><div class="timeline-content">美国大选 - 关注贸易政策走向</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">🔄</div>经济周期理论框架</div>
+                </div>
+                <div class="cycle-cards">
+                    <div class="cycle-card">
+                        <div class="cycle-name">康德拉季耶夫周期</div>
+                        <div class="cycle-period">54年</div>
+                        <div class="cycle-desc">宏观经济长波周期<br>技术革命驱动</div>
+                    </div>
+                    <div class="cycle-card">
+                        <div class="cycle-name">朱格拉周期</div>
+                        <div class="cycle-period">8-10年</div>
+                        <div class="cycle-desc">设备投资周期<br>产能扩张与收缩</div>
+                    </div>
+                    <div class="cycle-card">
+                        <div class="cycle-name">基钦周期</div>
+                        <div class="cycle-period">40个月</div>
+                        <div class="cycle-desc">库存周期<br>3-5年短周期波动</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关联分析页面 -->
+        <div id="correlation" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">🔗</div>资产与宏观经济相关性矩阵<span class="source-badge">Pearson相关系数</span></div>
+                </div>
+                <div class="heatmap">
+                    <div class="heatmap-cell heatmap-header"></div>
+                    <div class="heatmap-cell heatmap-header">标普500</div>
+                    <div class="heatmap-cell heatmap-header">纳指100</div>
+                    <div class="heatmap-cell heatmap-header">10Y国债</div>
+                    <div class="heatmap-cell heatmap-header">黄金</div>
+                    <div class="heatmap-cell heatmap-header">原油</div>
+                    <div class="heatmap-cell heatmap-label">联邦利率</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.6);">-0.45</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.5);">-0.38</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.8);">0.85</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.5);">0.42</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.3);">-0.15</div>
+                    <div class="heatmap-cell heatmap-label">CPI通胀</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.4);">-0.25</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.3);">-0.18</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.5);">-0.35</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.7);">0.68</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.4);">0.32</div>
+                    <div class="heatmap-cell heatmap-label">GDP增长</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.7);">0.72</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.8);">0.78</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.3);">0.22</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.2);">0.12</div>
+                    <div class="heatmap-cell" style="background: rgba(102,187,106,0.5);">0.45</div>
+                    <div class="heatmap-cell heatmap-label">失业率</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.6);">-0.52</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.7);">-0.62</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.2);">-0.08</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.3);">-0.15</div>
+                    <div class="heatmap-cell" style="background: rgba(239,83,80,0.4);">-0.28</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><div class="card-title-icon">📊</div>叠加分析<span class="source-badge">相关性分析</span></div>
+                    <div class="time-toggle">
+                        <button class="time-btn" data-chart="overlay" data-period="1y">1年</button>
+                        <button class="time-btn" data-chart="overlay" data-period="5y">5年</button>
+                        <button class="time-btn active" data-chart="overlay" data-period="10y">10年</button>
+                        <button class="time-btn" data-chart="overlay" data-period="50y">50年</button>
+                    </div>
+                </div>
+                <div id="overlayAnalysisChart" class="chart-box-lg"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            fred: {
+                baseUrl: 'https://api.stlouisfed.org/fred',
+                apiKey: 'YOUR_FRED_API_KEY',
+                series: {
+                    GDP: { name: '美国GDP环比折年率', unit: '万亿美元', frequency: '季度' },
+                    CPI: { name: '美国CPI同比', unit: '%', frequency: '月度' },
+                    UNEMPLOYMENT: { name: '美国失业率', unit: '%', frequency: '月度' },
+                    FED_RATE: { name: '联邦基金利率', unit: '%', frequency: '月度' },
+                    PMI: { name: '美国制造业PMI', unit: '', frequency: '月度' },
+                    PPI: { name: '美国PPI同比', unit: '%', frequency: '月度' },
+                    DXY: { name: '美元指数', unit: '', frequency: '日度' }
+                }
+            }
+        };
+
+        let macroData = {};
+        let stockData = {};
+        let charts = {};
+        let chartPeriods = {
+            usGdp: '10y', usFed: '10y', pmi: '10y', dxy: '10y', cnMacro: '10y', pe: '10y', overlay: '10y'
+        };
+        let updateIntervals = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            initCharts();
+            initTimeToggles();
+            loadData();
+            startUpdates();
+        });
+
+        function initNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(btn.dataset.page).classList.add('active');
+                    setTimeout(() => {
+                        initPageCharts(btn.dataset.page);
+                        Object.values(charts).forEach(chart => chart && chart.resize());
+                    }, 100);
+                });
+            });
+        }
+
+        function initPageCharts(page) {
+            if (page === 'indicators') {
+                setTimeout(() => { updateCycleCharts(); }, 200);
+            }
+            switch(page) {
+                case 'dashboard':
+                    updateUsGdpChart(chartPeriods.usGdp || '10y');
+                    updateUsFedChart(chartPeriods.usFed || '10y');
+                    break;
+                case 'us-economy':
+                    updatePmiChart(chartPeriods.pmi || '10y');
+                    updateDxyChart(chartPeriods.dxy || '10y');
+                    break;
+                case 'cn-economy':
+                    updateCnMacroChart(chartPeriods.cnMacro || '10y');
+                    break;
+                case 'valuation':
+                    updatePeChart(chartPeriods.pe || '10y');
+                    break;
+                case 'correlation':
+                    updateOverlayChart(chartPeriods.overlay || '10y');
+                    break;
+            }
+        }
+
+        function initTimeToggles() {
+            document.querySelectorAll('.time-toggle .time-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const parent = this.closest('.time-toggle');
+                    parent.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const period = this.dataset.period;
+                    const chartId = this.dataset.chart;
+                    if (chartId) {
+                        chartPeriods[chartId] = period;
+                        updateChartByPeriod(chartId, period);
+                    }
+                });
+            });
+            document.querySelectorAll('#honghao-special .time-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#honghao-special .time-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById('honghao-summary').style.display = btn.dataset.view === 'summary' ? 'block' : 'none';
+                    document.getElementById('honghao-full').style.display = btn.dataset.view === 'full' ? 'block' : 'none';
+                });
+            });
+        }
+
+        function updateChartByPeriod(chartId, period) {
+            switch(chartId) {
+                case 'usGdp': updateUsGdpChart(period); break;
+                case 'usFed': updateUsFedChart(period); break;
+                case 'pmi': updatePmiChart(period); break;
+                case 'dxy': updateDxyChart(period); break;
+                case 'cnMacro': updateCnMacroChart(period); break;
+                case 'pe': updatePeChart(period); break;
+                case 'overlay': updateOverlayChart(period); break;
+            }
+        }
+
+        function initCharts() {
+            const chartIds = ['usGdpChart', 'usFedChart', 'pmiChart', 'dxyChart', 'cnMacroChart', 'peChart', 'percentileChart', 'overlayAnalysisChart', 'inventoryCycleChart', 'creditCycleChart', 'dollarCycleChart', 'kondratievChart'];
+            chartIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { charts[id] = echarts.init(el); }
+            });
+            window.addEventListener('resize', () => { Object.values(charts).forEach(chart => chart && chart.resize()); });
+        }
+
+        function loadData() {
+            generate100YearData();
+            generateCycleData();
+            generateStockData();
+            updateAllDisplays();
+        }
+
+        function generate100YearData() {
+            const now = new Date();
+            const startYear = now.getFullYear() - 100;
+            macroData.GDP = generateLongTermData('GDP', startYear, now.getFullYear(), 'quarterly');
+            macroData.CPIAUCSL = generateLongTermData('CPI', startYear, now.getFullYear(), 'monthly');
+            macroData.UNRATE = generateLongTermData('UNRATE', startYear, now.getFullYear(), 'monthly');
+            macroData.FEDFUNDS = generateLongTermData('FEDFUNDS', startYear, now.getFullYear(), 'monthly');
+            macroData.MANEMP = generateLongTermData('PMI', startYear, now.getFullYear(), 'monthly');
+            macroData.PPIACO = generateLongTermData('PPI', startYear, now.getFullYear(), 'monthly');
+            macroData.DTWEXB = generateLongTermData('DXY', startYear, now.getFullYear(), 'daily');
+            const cnStartYear = 1985;
+            macroData.CHINA_GDP = generateChinaLongTermData('GDP', cnStartYear, now.getFullYear());
+            macroData.CHINA_CPI = generateChinaLongTermData('CPI', cnStartYear, now.getFullYear());
+            macroData.CHINA_PMI = generateChinaLongTermData('PMI', cnStartYear, now.getFullYear());
+            macroData.CNY_RATE = generateChinaLongTermData('CNY', cnStartYear, now.getFullYear());
+            macroData.CHINA_PPI = generateChinaLongTermData('PPI', cnStartYear, now.getFullYear());
+            macroData.EXPORT = generateChinaLongTermData('EXPORT', cnStartYear, now.getFullYear());
+            macroData.PE_HISTORY = generatePeHistoryData(now.getFullYear() - 50, now.getFullYear());
+        }
+
+        function generateLongTermData(type, startYear, endYear, frequency) {
+            const data = [];
+            const configs = {
+                GDP: { base: 26.95, vol: 0.15, trend: 0.025 },
+                CPI: { base: 310, vol: 2, trend: 0.035 },
+                UNRATE: { base: 3.7, vol: 0.3, trend: 0 },
+                FEDFUNDS: { base: 5.33, vol: 0.35, trend: -0.015 },
+                PMI: { base: 49.1, vol: 2.5, trend: 0 },
+                PPI: { base: 280, vol: 5, trend: 0.025 },
+                DXY: { base: 103.5, vol: 1.5, trend: 0 }
+            };
+            const config = configs[type] || { base: 100, vol: 1, trend: 0 };
+            let value = config.base;
+            for (let year = startYear; year <= endYear; year++) {
+                for (let quarter = 0; quarter < 4; quarter++) {
+                    if (frequency === 'quarterly' || (frequency === 'monthly' && quarter === 0) || (frequency === 'daily' && quarter === 0)) {
+                        const date = new Date(year, quarter * 3 + 1, 1);
+                        const trendFactor = config.trend * (year - startYear) / 100;
+                        const cyclePhase = (year - startYear) * Math.PI / 10;
+                        const cycleFactor = Math.sin(cyclePhase) * config.vol * 0.3;
+                        const randomFactor = (Math.random() - 0.5) * config.vol * 0.2;
+                        value = config.base * (1 + trendFactor) + cycleFactor + randomFactor;
+                        value = Math.max(0, parseFloat(value.toFixed(2)));
+                        if (frequency === 'daily') {
+                            for (let month = 0; month < 12; month++) {
+                                const dayCount = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
+                                for (let day = 1; day <= Math.min(dayCount, 10); day++) {
+                                    const dateStr = new Date(year, month, day).toISOString().split('T')[0];
+                                    data.push({ date: dateStr, value: parseFloat((value + (Math.random() - 0.5) * 0.5).toFixed(2)) });
+                                }
+                            }
+                        } else {
+                            data.push({ date: date.toISOString().split('T')[0], value: value });
+                        }
+                    }
+                }
+            }
+            return data;
+        }
+
+        function generateChinaLongTermData(name, startYear, endYear) {
+            const data = [];
+            const configs = {
+                GDP: { base: 10, vol: 0.02, trend: -0.03 },
+                CPI: { base: 3, vol: 0.02, trend: 0 },
+                PMI: { base: 50, vol: 0.03, trend: 0 },
+                CNY: { base: 6.5, vol: 0.015, trend: 0.02 },
+                PPI: { base: 4, vol: 0.03, trend: -0.02 },
+                EXPORT: { base: 1000, vol: 0.04, trend: 0.08 }
+            };
+            const config = configs[name] || { base: 100, vol: 0.02, trend: 0.05 };
+            let value = config.base;
+            for (let year = startYear; year <= endYear; year++) {
+                for (let quarter = 1; quarter <= 4; quarter++) {
+                    value = value * (1 + config.trend) + (Math.random() - 0.5) * config.vol;
+                    if ((year === 2008 || year === 2009) && config.base > 5) value *= 0.9;
+                    if (year === 2020 && config.base > 5) value *= 0.95;
+                    data.push({ date: `${year}-Q${quarter}`, value: Math.max(value, 0.1) });
+                }
+            }
+            return data;
+        }
+
+        function generatePeHistoryData(startYear, endYear) {
+            const data = [];
+            for (let year = startYear; year <= endYear; year++) {
+                let basePe = 17;
+                if (year >= 1995 && year <= 2000) basePe = 25 + (year - 1995) * 4;
+                else if (year >= 2001 && year <= 2003) basePe = 40 - (year - 2001) * 10;
+                else if (year >= 2007 && year <= 2008) basePe = 22 - (year - 2007) * 3;
+                else if (year >= 2009 && year <= 2019) basePe = 18 + (year - 2009) * 0.5;
+                else if (year >= 2020 && year <= 2021) basePe = 22 + (year - 2020) * 2;
+                else basePe = 20 + (Math.random() - 0.5) * 4;
+                for (let q = 0; q < 4; q++) {
+                    const value = basePe + (Math.random() - 0.5) * 3;
+                    const date = new Date(year, q * 3 + 1, 1);
+                    data.push({ date: date.toISOString().split('T')[0], value: parseFloat(value.toFixed(1)) });
+                }
+            }
+            return data;
+        }
+
+        function generateCycleData() {
+            const now = new Date();
+            const startYear = now.getFullYear() - 20;
+            macroData.INVENTORY_CYCLE = [];
+            const inventoryPhases = ['被动去库存', '主动补库存', '被动补库存', '主动去库存'];
+            for (let i = 0; i < 80; i++) {
+                const year = startYear + Math.floor(i / 4);
+                const quarter = (i % 4) + 1;
+                const value = Math.sin(i * Math.PI / 4) * 50 + 50;
+                macroData.INVENTORY_CYCLE.push({ date: `${year}-Q${quarter}`, value: value, phase: inventoryPhases[i % 4] });
+            }
+            macroData.CREDIT_CYCLE = [];
+            for (let i = 0; i < 240; i++) {
+                const date = new Date();
+                date.setMonth(date.getMonth() - 240 + i);
+                const value = Math.sin(i * Math.PI / 24) * 2 + 10.5;
+                macroData.CREDIT_CYCLE.push({ date: date.toISOString().split('T')[0], value: value });
+            }
+            macroData.DOLLAR_CYCLE = [];
+            for (let i = 0; i < 480; i++) {
+                const date = new Date();
+                date.setMonth(date.getMonth() - 480 + i);
+                const value = Math.sin(i * Math.PI / 90) * 15 + 90;
+                macroData.DOLLAR_CYCLE.push({ date: date.toISOString().split('T')[0], value: value });
+            }
+            macroData.KONDRATIEV = [];
+            for (let i = 0; i < 120; i++) {
+                const year = 1920 + i * 0.5;
+                const phase = Math.sin(i * Math.PI / 27);
+                macroData.KONDRATIEV.push({ date: Math.floor(year).toString(), value: phase * 50 + 50 });
+            }
+        }
+
+        function generateStockData() {
+            const prices = { 'AAPL': 185.50, 'MSFT': 378.90, 'GOOGL': 141.80, 'AMZN': 178.25, 'NVDA': 495.20, 'META': 505.75, 'TSLA': 248.50, '600519.SS': 1700.00, '601398.SS': 5.80, '601288.SS': 4.20, '601988.SS': 3.80, '600036.SS': 35.50 };
+            const names = { 'AAPL': 'Apple Inc.', 'MSFT': 'Microsoft', 'GOOGL': 'Alphabet', 'AMZN': 'Amazon', 'NVDA': 'NVIDIA', 'META': 'Meta Platforms', 'TSLA': 'Tesla', '600519.SS': '贵州茅台', '601398.SS': '工商银行', '601288.SS': '农业银行', '601988.SS': '中国银行', '600036.SS': '招商银行' };
+            Object.keys(prices).forEach(symbol => {
+                const basePrice = prices[symbol];
+                const prices_history = [];
+                let price = basePrice * 0.6;
+                const now = new Date();
+                for (let i = 365; i >= 0; i--) {
+                    const date = new Date(now);
+                    date.setDate(date.getDate() - i);
+                    if (date.getDay() !== 0 && date.getDay() !== 6) {
+                        price = price * (1 + (Math.random() - 0.48) * 0.02);
+                        prices_history.push({ date: date.toISOString().split('T')[0], close: parseFloat(price.toFixed(2)) });
+                    }
+                }
+                const currentPrice = prices_history[prices_history.length - 1].close;
+                const prevClose = prices_history[prices_history.length - 2].close;
+                const change = ((currentPrice - prevClose) / prevClose * 100);
+                stockData[symbol] = { name: names[symbol], price: currentPrice, change: change, history: prices_history, pattern: detectPattern(prices_history) };
+            });
+        }
+
+        function detectPattern(history) {
+            if (!history || history.length < 60) return { type: 'hold', label: '观望' };
+            const recent = history.slice(-30);
+            const highs = recent.map(d => d.close);
+            const max = Math.max(...highs);
+            const min = Math.min(...highs);
+            const depth = (max - min) / max;
+            const trend = (recent[recent.length - 1].close - recent[0].close) / recent[0].close;
+            if (depth > 0.15 && depth < 0.35 && trend > 0.05) return { type: 'buy', label: '买入信号' };
+            else if (trend > 0.02) return { type: 'hold', label: '持有' };
+            else return { type: 'sell', label: '观望' };
+        }
+
+        function updateAllDisplays() {
+            updateMacroStats();
+            updateStockDisplays();
+            updateEconomyTables();
+            updateValuationData();
+            updateAllCharts();
+            updateCycleCharts();
+        }
+
+        function updateMacroStats() {
+            updateMetric('usGdp', 'GDP', '万亿美元', 2);
+            updateMetric('usCpi', 'CPIAUCSL', '%', 1);
+            updateMetric('usFedRate', 'FEDFUNDS', '%', 2);
+            updateMetric('usUnemployment', 'UNRATE', '%', 1);
+            updateMetric('cnGdp', 'CHINA_GDP', '%', 1);
+            updateMetric('cnCpi', 'CHINA_CPI', '%', 1);
+            updateMetric('cnyRate', 'CNY_RATE', '', 2);
+            updateMetric('cnPmi', 'CHINA_PMI', '', 1);
+        }
+
+        function updateMetric(prefix, key, unit, decimals) {
+            const data = macroData[key];
+            if (!data || data.length < 2) return;
+            const current = data[data.length - 1];
+            const previous = data[data.length - 2];
+            const mom = ((current.value - previous.value) / previous.value * 100).toFixed(2);
+            document.getElementById(prefix).innerHTML = current.value.toFixed(decimals) + (unit ? `<span class="metric-unit">${unit}</span>` : '');
+            document.getElementById(prefix + 'Change').innerHTML = `<span class="metric-arrow ${parseFloat(mom) >= 0 ? 'up' : 'down'}">${parseFloat(mom) >= 0 ? '↑' : '↓'}</span> ${Math.abs(mom)}%`;
+        }
+
+        function updateStockDisplays() {
+            const previewHtml = Object.keys(stockData).slice(0, 8).map(symbol => {
+                const stock = stockData[symbol];
+                const changeClass = stock.change >= 0 ? 'up' : 'down';
+                const changeSymbol = stock.change >= 0 ? '+' : '';
+                return `<div class="stock-card"><div class="stock-symbol">${symbol}</div><div class="stock-name">${stock.name}</div><div class="stock-price">${stock.price.toFixed(2)}</div><div class="stock-change ${changeClass}">${changeSymbol}${stock.change.toFixed(2)}%</div><div class="stock-pattern pattern-${stock.pattern.type}">${stock.pattern.label}</div></div>`;
+            }).join('');
+            document.getElementById('stockPreview').innerHTML = previewHtml;
+            document.getElementById('nasdaqStocks').innerHTML = Object.keys(stockData).filter(s => !s.includes('.SS')).slice(0, 10).map(symbol => {
+                const stock = stockData[symbol];
+                const changeClass = stock.change >= 0 ? 'up' : 'down';
+                const changeSymbol = stock.change >= 0 ? '+' : '';
+                return `<div class="stock-card"><div class="stock-symbol">${symbol}</div><div class="stock-name">${stock.name}</div><div class="stock-price">${stock.price.toFixed(2)}</div><div class="stock-change ${changeClass}">${changeSymbol}${stock.change.toFixed(2)}%</div><div class="stock-pattern pattern-${stock.pattern.type}">${stock.pattern.label}</div></div>`;
+            }).join('');
+            document.getElementById('a50Stocks').innerHTML = Object.keys(stockData).filter(s => s.includes('.SS')).map(symbol => {
+                const stock = stockData[symbol];
+                const changeClass = stock.change >= 0 ? 'up' : 'down';
+                const changeSymbol = stock.change >= 0 ? '+' : '';
+                return `<div class="stock-card"><div class="stock-symbol">${symbol.replace('.SS', '')}</div><div class="stock-name">${stock.name}</div><div class="stock-price">${stock.price.toFixed(2)}</div><div class="stock-change ${changeClass}">${changeSymbol}${stock.change.toFixed(2)}%</div><div class="stock-pattern pattern-${stock.pattern.type}">${stock.pattern.label}</div></div>`;
+            }).join('');
+        }
+
+        function updateEconomyTables() {
+            const usItems = [{ key: 'GDP', name: '美国GDP环比折年率', unit: '万亿美元', freq: '季度' }, { key: 'CPIAUCSL', name: '美国CPI同比', unit: '%', freq: '月度' }, { key: 'FEDFUNDS', name: '联邦基金利率', unit: '%', freq: '月度' }, { key: 'UNRATE', name: '美国失业率', unit: '%', freq: '月度' }, { key: 'MANEMP', name: '美国制造业PMI', unit: '', freq: '月度' }, { key: 'PPIACO', name: '美国PPI同比', unit: '%', freq: '月度' }, { key: 'DTWEXB', name: '美元指数', unit: '', freq: '日度' }];
+            document.getElementById('usEconomyTable').innerHTML = usItems.map(item => {
+                const data = macroData[item.key];
+                if (!data || data.length < 2) return '';
+                const current = data[data.length - 1];
+                const previous = data[data.length - 2];
+                const mom = ((current.value - previous.value) / previous.value * 100).toFixed(2);
+                return `<tr><td><strong>${item.name}</strong></td><td class="num">${current.value.toFixed(2)}${item.unit}</td><td class="num">${previous.value.toFixed(2)}${item.unit}</td><td class="num ${parseFloat(mom) >= 0 ? 'up' : 'down'}">${parseFloat(mom) >= 0 ? '+' : ''}${mom}%</td><td class="num">--</td><td>${item.freq}</td><td>${current.date}</td></tr>`;
+            }).join('');
+            const cnItems = [{ key: 'CHINA_GDP', name: '中国GDP同比', unit: '%', freq: '季度' }, { key: 'CHINA_CPI', name: '中国CPI同比', unit: '%', freq: '月度' }, { key: 'CHINA_PMI', name: '中国制造业PMI', unit: '', freq: '月度' }, { key: 'CNY_RATE', name: '人民币汇率', unit: 'CNY/USD', freq: '日度' }, { key: 'CHINA_PPI', name: '中国PPI同比', unit: '%', freq: '月度' }, { key: 'EXPORT', name: '中国出口金额', unit: '亿美元', freq: '月度' }];
+            document.getElementById('cnEconomyTable').innerHTML = cnItems.map(item => {
+                const data = macroData[item.key];
+                if (!data || data.length < 2) return '';
+                const current = data[data.length - 1];
+                const previous = data[data.length - 2];
+                const mom = ((current.value - previous.value) / previous.value * 100).toFixed(2);
+                return `<tr><td><strong>${item.name}</strong></td><td class="num">${current.value.toFixed(2)}${item.unit}</td><td class="num">${previous.value.toFixed(2)}${item.unit}</td><td class="num ${parseFloat(mom) >= 0 ? 'up' : 'down'}">${parseFloat(mom) >= 0 ? '+' : ''}${mom}%</td><td class="num">--</td><td>${item.freq}</td><td>${current.date}</td></tr>`;
+            }).join('');
+        }
+
+        function updateValuationData() {
+            document.getElementById('peValue').textContent = '25.4';
+            document.getElementById('pbValue').textContent = '4.2';
+            document.getElementById('dividendValue').textContent = '1.8%';
+            document.getElementById('capmValue').textContent = '10.5%';
+            document.getElementById('scoreValue').textContent = '62';
+            const valuationTable = document.getElementById('valuationTable');
+            const valuationData = [{ name: '标普500', pe: 25.4, pb: 4.2, ps: 3.5, ev: 18.5, div: 1.3, roe: 16.5, status: '合理' }, { name: '纳斯达克100', pe: 32.5, pb: 8.2, ps: 6.8, ev: 25.3, div: 0.6, roe: 22.5, status: '高估' }, { name: '沪深300', pe: 14.2, pb: 1.6, ps: 1.8, ev: 10.5, div: 2.5, roe: 11.2, status: '低估' }, { name: '创业板指', pe: 45.8, pb: 5.2, ps: 4.5, ev: 28.6, div: 0.8, roe: 12.8, status: '高估' }, { name: '恒生指数', pe: 10.5, pb: 1.1, ps: 1.2, ev: 8.5, div: 3.8, roe: 10.5, status: '低估' }];
+            valuationTable.innerHTML = valuationData.map(v => `<tr><td><strong>${v.name}</strong></td><td class="num">${v.pe}</td><td class="num">${v.pb}</td><td class="num">${v.ps}</td><td class="num">${v.ev}</td><td class="num">${v.div}</td><td class="num">${v.roe}</td><td><span class="stock-pattern ${v.status === '高估' ? 'pattern-sell' : v.status === '低估' ? 'pattern-buy' : 'pattern-hold'}">${v.status}</span></td></tr>`).join('');
+        }
+
+        function updateAllCharts() {
+            updateUsGdpChart('10y');
+            updateUsFedChart('10y');
+            updatePmiChart('10y');
+            updateDxyChart('10y');
+            updateCnMacroChart('10y');
+            updatePeChart('10y');
+            updatePercentileChart();
+            updateOverlayChart('10y');
+        }
+
+        function getDataByPeriod(data, period) {
+            if (!data || data.length === 0) return [];
+            const now = new Date();
+            const periodDays = { '1y': 365, '5y': 1825, '10y': 3650, '30y': 10950, '50y': 18250 };
+            const days = periodDays[period] || 3650;
+            const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+            return data.filter(d => new Date(d.date) >= cutoff);
+        }
+
+        function updateUsGdpChart(period) {
+            if (!charts.usGdpChart) return;
+            const gdp = getDataByPeriod(macroData.GDP, period);
+            const cpi = getDataByPeriod(macroData.CPIAUCSL, period);
+            if (gdp.length === 0) return;
+            const dates = gdp.map(d => d.date);
+            const gdpValues = gdp.map(d => d.value);
+            const cpiValues = normalize(cpi.length > 0 ? cpi.map(d => d.value) : new Array(dates.length).fill(0));
+            const minGDP = Math.floor(Math.min(...gdpValues));
+            const maxGDP = Math.ceil(Math.max(...gdpValues));
+            charts.usGdpChart.setOption({
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: Math.ceil(dates.length / 10) - 1 } },
+                yAxis: [{ type: 'value', name: 'GDP环比折年率(%)', min: minGDP, max: maxGDP, axisLabel: { fontSize: 10, color: '#8888a0' } }, { type: 'value', show: false }],
+                series: [{ type: 'line', smooth: true, data: gdpValues, lineStyle: { width: 2, color: '#3b82f6' }, areaStyle: { color: 'rgba(59, 130, 246, 0.1)' } }, { type: 'line', smooth: true, data: cpiValues, lineStyle: { width: 2, color: '#10b981', type: 'dashed' } }]
+            }, true);
+        }
+
+        function updateUsFedChart(period) {
+            if (!charts.usFedChart) return;
+            const fed = getDataByPeriod(macroData.FEDFUNDS, period);
+            const unemp = getDataByPeriod(macroData.UNRATE, period);
+            if (fed.length === 0) return;
+            const dates = fed.map(d => d.date);
+            const fedValues = fed.map(d => d.value);
+            const unempValues = unemp.length > 0 ? unemp.map(d => d.value) : new Array(dates.length).fill(0);
+            const minFed = Math.floor(Math.min(...fedValues));
+            const maxFed = Math.ceil(Math.max(...fedValues) + 1);
+            const minUnemp = Math.floor(Math.min(...unempValues.filter(v => v > 0)));
+            const maxUnemp = Math.ceil(Math.max(...unempValues.filter(v => v > 0)) + 1);
+            charts.usFedChart.setOption({
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: Math.ceil(dates.length / 10) - 1 } },
+                yAxis: [{ type: 'value', name: '联邦利率(%)', min: minFed, max: maxFed, axisLabel: { fontSize: 10, color: '#8888a0' } }, { type: 'value', name: '失业率(%)', min: minUnemp, max: maxUnemp, axisLabel: { fontSize: 10, color: '#8888a0' } }],
+                series: [{ type: 'line', smooth: true, data: fedValues, lineStyle: { width: 2, color: '#8b5cf6' }, areaStyle: { color: 'rgba(139, 92, 246, 0.1)' } }, { type: 'line', smooth: true, data: unempValues, lineStyle: { width: 2, color: '#ef4444', type: 'dashed' } }]
+            }, true);
+        }
+
+        function updatePmiChart(period) {
+            if (!charts.pmiChart) return;
+            const pmi = getDataByPeriod(macroData.MANEMP, period);
+            if (pmi.length === 0) return;
+            const values = pmi.map(d => d.value);
+            const dates = pmi.map(d => d.date);
+            const minVal = Math.floor(Math.min(...values));
+            const maxVal = Math.ceil(Math.max(...values));
+            charts.pmiChart.setOption({
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: Math.ceil(dates.length / 10) - 1 } },
+                yAxis: { type: 'value', name: 'PMI', min: Math.max(0, minVal - 5), max: Math.min(100, maxVal + 5), axisLabel: { fontSize: 10, color: '#8888a0' } },
+                series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#3b82f6' }, areaStyle: { color: 'rgba(59, 130, 246, 0.1)' }, markLine: { silent: true, data: [{ yAxis: 50, lineStyle: { color: '#10b981' } }] } }]
+            }, true);
+        }
+
+        function updateDxyChart(period) {
+            if (!charts.dxyChart) return;
+            const dxy = getDataByPeriod(macroData.DTWEXB, period);
+            if (dxy.length === 0) return;
+            const values = dxy.map(d => d.value);
+            const dates = dxy.map(d => d.date);
+            const minVal = Math.floor(Math.min(...values));
+            const maxVal = Math.ceil(Math.max(...values));
+            charts.dxyChart.setOption({
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: Math.ceil(dates.length / 10) - 1 } },
+                yAxis: { type: 'value', name: '美元指数', min: minVal, max: maxVal, axisLabel: { fontSize: 10, color: '#8888a0' } },
+                series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#ef4444' }, areaStyle: { color: 'rgba(239, 68, 68, 0.1)' } }]
+            }, true);
+        }
+
+        function updateCnMacroChart(period) {
+            if (!charts.cnMacroChart) return;
+            const pmi = getDataByPeriod(macroData.CHINA_PMI, period);
+            const ppi = getDataByPeriod(macroData.CHINA_PPI, period);
+            if (pmi.length === 0) return;
+            const dates = pmi.map(d => d.date);
+            const pmiValues = pmi.map(d => d.value);
+            const ppiValues = normalize(ppi.length > 0 ? ppi.map(d => d.value) : new Array(dates.length).fill(0));
+            charts.cnMacroChart.setOption({
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '15%' },
+                dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: Math.ceil(dates.length / 10) - 1 } },
+                yAxis: [{ type: 'value', name: 'PMI', min: 45, max: 55, axisLabel: { fontSize: 10, color: '#8888a0' } }, { show: false }],
+                series: [{ type: 'line', smooth: true, data: pmiValues, lineStyle: { width: 2, color: '#ef4444' }, areaStyle: { color: 'rgba(239, 68, 68, 0.1)' }, markLine: { silent: true, data: [{ yAxis: 50, lineStyle: { color: '#10b981' } }] } }, { type: 'line', smooth: true, data: ppiValues, lineStyle: { width: 2, color: '#f59e0b', type: 'dashed' } }]
+            }, true);
+        }
+
+        function updatePeChart(period) {
+            if (!charts.peChart) return;
+            const peData = getDataByPeriod(macroData.PE_HISTORY, period);
+            const years = peData.map(d => d.date);
+            const peValues = peData.map(d => d.value);
+            const avgValues = years.map(() => 22.3);
+            const minVal = Math.floor(Math.min(...peValues));
+            const maxVal = Math.ceil(Math.max(...peValues));
+            charts.peChart.setOption({
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                xAxis: { type: 'category', data: years, axisLabel: { fontSize: 10, color: '#8888a0', interval: Math.ceil(years.length / 10) - 1 } },
+                yAxis: { type: 'value', name: 'PE', min: minVal, max: maxVal, axisLabel: { fontSize: 10, color: '#8888a0' } },
+                series: [{ type: 'line', smooth: true, data: peValues, lineStyle: { width: 2, color: '#4f46e5' }, areaStyle: { color: 'rgba(79, 70, 229, 0.1)' } }, { type: 'line', data: avgValues, lineStyle: { width: 2, color: '#8888a0', type: 'dashed' } }]
+            }, true);
+        }
+
+        function updatePercentileChart() {
+            if (!charts.percentileChart) return;
+            const data = [{ name: 'PE', value: 62 }, { name: 'PB', value: 58 }, { name: 'PS', value: 72 }, { name: 'EV/EBITDA', value: 65 }];
+            charts.percentileChart.setOption({
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '15%' },
+                xAxis: { type: 'category', data: data.map(d => d.name), axisLabel: { fontSize: 10, color: '#8888a0' } },
+                yAxis: { type: 'value', max: 100, axisLabel: { fontSize: 10, color: '#8888a0' } },
+                series: [{ type: 'bar', data: data.map(d => ({ value: d.value, itemStyle: { color: d.value > 70 ? '#ef4444' : d.value < 30 ? '#10b981' : '#f59e0b', borderRadius: [4, 4, 0, 0] } })), barWidth: '50%' } }]
+            }, true);
+        }
+
+        function updateOverlayChart(period) {
+            if (!charts.overlayAnalysisChart) return;
+            const sp500 = [];
+            const fedRate = [];
+            const now = new Date();
+            const periodDays = { '1y': 365, '5y': 1825, '10y': 3650, '30y': 10950, '50y': 18250 };
+            const days = periodDays[period] || 3650;
+            let sp = 4000;
+            let rate = 5.33;
+            for (let i = days; i >= 0; i--) {
+                const date = new Date(now);
+                date.setDate(date.getDate() - i);
+                if (date.getDay() !== 0 && date.getDay() !== 6) {
+                    sp = sp * (1 + (Math.random() - 0.48) * 0.02);
+                    rate = rate * (1 - 0.005) + (Math.random() - 0.5) * 0.15;
+                    rate = Math.max(3, Math.min(6, rate));
+                    sp500.push({ date: date.toISOString().split('T')[0], value: sp });
+                    fedRate.push({ date: date.toISOString().split('T')[0], value: rate });
+                }
+            }
+            const dates = sp500.map(d => d.date);
+            const spValues = normalize(sp500.map(d => d.value));
+            const rateValues = normalize(fedRate.map(d => d.value));
+            charts.overlayAnalysisChart.setOption({
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: Math.ceil(dates.length / 10) - 1 } },
+                yAxis: [{ type: 'value', name: '标普500', axisLabel: { fontSize: 10, color: '#8888a0' } }, { type: 'value', show: false }],
+                series: [{ type: 'line', smooth: true, data: spValues, lineStyle: { width: 2, color: '#3b82f6' }, areaStyle: { color: 'rgba(59, 130, 246, 0.1)' }, name: '标普500' }, { type: 'line', smooth: true, data: rateValues, lineStyle: { width: 2, color: '#ef4444', type: 'dashed' }, name: '联邦利率' }]
+            }, true);
+        }
+
+        function updateCycleCharts() {
+            if (charts.inventoryCycleChart) {
+                const data = macroData.INVENTORY_CYCLE || [];
+                const dates = data.map(d => d.date);
+                const values = data.map(d => d.value);
+                const minVal = Math.floor(Math.min(...values));
+                const maxVal = Math.ceil(Math.max(...values));
+                charts.inventoryCycleChart.setOption({
+                    tooltip: { trigger: 'axis', formatter: function(params) {
+                        const idx = params[0].dataIndex;
+                        const phase = data[idx]?.phase || '';
+                        return `${params[0].name}<br/>库存指数: ${params[0].value.toFixed(2)}<br/>周期阶段: ${phase}`;
+                    }},
+                    grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                    dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                    xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: 'auto' } },
+                    yAxis: { type: 'value', name: '库存指数', min: minVal, max: maxVal, axisLabel: { fontSize: 10, color: '#8888a0' } },
+                    series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#4f46e5' }, areaStyle: { color: 'rgba(79, 70, 229, 0.1)' }, markLine: { silent: true, data: [{ yAxis: 50, lineStyle: { color: '#10b981' }, label: { formatter: '扩张/收缩分界', position: 'end' } }, { yAxis: 30, lineStyle: { color: '#f59e0b', type: 'dashed' }, label: { formatter: '低位预警', position: 'end' } }, { yAxis: 70, lineStyle: { color: '#f59e0b', type: 'dashed' }, label: { formatter: '高位风险', position: 'end' } }] } }]
+                });
+            }
+            if (charts.creditCycleChart) {
+                const data = macroData.CREDIT_CYCLE || [];
+                const dates = data.map(d => d.date);
+                const values = data.map(d => d.value);
+                const recentValues = values.slice(-60);
+                const minVal = Math.floor(Math.min(...recentValues)) - 1;
+                const maxVal = Math.ceil(Math.max(...recentValues)) + 1;
+                charts.creditCycleChart.setOption({
+                    tooltip: { trigger: 'axis' },
+                    grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                    dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                    xAxis: { type: 'category', data: dates.slice(-60), axisLabel: { fontSize: 10, color: '#8888a0', interval: 9 } },
+                    yAxis: { type: 'value', name: 'M2同比(%)', min: minVal, max: maxVal, axisLabel: { fontSize: 10, color: '#8888a0' } },
+                    series: [{ type: 'line', smooth: true, data: recentValues, lineStyle: { width: 2, color: '#ef4444' }, areaStyle: { color: 'rgba(239, 68, 68, 0.1)' }, markLine: { silent: true, data: [{ yAxis: 10.5, lineStyle: { color: '#10b981' }, label: { formatter: '均值 10.5%', position: 'end' } }] } }]
+                });
+            }
+            if (charts.dollarCycleChart) {
+                const data = macroData.DOLLAR_CYCLE || [];
+                const dates = data.map(d => d.date);
+                const values = data.map(d => d.value);
+                const minVal = Math.floor(Math.min(...values));
+                const maxVal = Math.ceil(Math.max(...values));
+                charts.dollarCycleChart.setOption({
+                    tooltip: { trigger: 'axis' },
+                    grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                    dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                    xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: 59 } },
+                    yAxis: { type: 'value', name: '美元指数', min: minVal, max: maxVal, axisLabel: { fontSize: 10, color: '#8888a0' } },
+                    series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#f59e0b' }, areaStyle: { color: 'rgba(245, 158, 11, 0.1)' }, markLine: { silent: true, data: [{ yAxis: 90, lineStyle: { color: '#10b981' }, label: { formatter: '长期均值', position: 'end' } }, { yAxis: 110, lineStyle: { color: '#ef4444', type: 'dashed' }, label: { formatter: '历史高点', position: 'end' } }] } }]
+                });
+            }
+            if (charts.kondratievChart) {
+                const data = macroData.KONDRATIEV || [];
+                const dates = data.map(d => d.date);
+                const values = data.map(d => d.value);
+                const minVal = Math.floor(Math.min(...values));
+                const maxVal = Math.ceil(Math.max(...values));
+                charts.kondratievChart.setOption({
+                    tooltip: { trigger: 'axis' },
+                    grid: { left: '12%', right: '8%', top: '10%', bottom: '20%' },
+                    dataZoom: [{ type: 'inside', start: 0, end: 100 }, { type: 'slider', start: 0, end: 100, height: 20 }],
+                    xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 10, color: '#8888a0', interval: 19 } },
+                    yAxis: { type: 'value', name: '周期位置', min: minVal, max: maxVal, axisLabel: { fontSize: 10, color: '#8888a0' } },
+                    series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 3, color: '#3b82f6' }, areaStyle: { color: 'rgba(59, 130, 246, 0.15)' }, markArea: { silent: true, data: [[{ name: '萧条期', xAxis: '1980' }, { xAxis: '2000', itemStyle: { color: 'rgba(239,68,68,0.1)' } }], [{ name: '复苏期', xAxis: '2000' }, { xAxis: '2025', itemStyle: { color: 'rgba(245,158,11,0.1)' } }]] } }]
+                });
+            }
+        }
+
+        function normalize(data) {
+            if (!data || data.length === 0) return [];
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const range = max - min || 1;
+            return data.map(v => ((v - min) / range * 100));
+        }
+
+        function startUpdates() {
+            updateIntervals.push(setInterval(() => {
+                updateStockPrices();
+                updateTime();
+            }, 1000));
+        }
+
+        function updateStockPrices() {
+            Object.keys(stockData).forEach(symbol => {
+                const stock = stockData[symbol];
+                const change = (Math.random() - 0.5) * 0.4;
+                stock.change += change;
+                stock.price *= (1 + change / 100);
+                if (Math.random() > 0.98) { stock.pattern = detectPattern(stock.history); }
+            });
+            updateStockDisplays();
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('updateTime').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
+        }
+    </script>
+</body>
+</html>
