@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据测试</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script>
+    if (typeof echarts === 'undefined') {
+        document.write('<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"><\\/script>');
+    }
+    </script>
+</head>
+<body>
+    <h1>数据测试页面</h1>
+    <div id="output"></div>
+    <div id="metrics"></div>
+    <div id="stocks"></div>
+    <div id="tables"></div>
+    
+    <script>
+    console.log('测试脚本开始执行');
+    
+    // 测试数据生成
+    function generateTestData() {
+        const data = {};
+        
+        // 生成100年美国数据
+        const startYear = 1925;
+        const now = new Date().getFullYear();
+        data.GDP = [];
+        data.CPI = [];
+        
+        for (let year = startYear; year <= now; year++) {
+            for (let q = 0; q < 4; q++) {
+                data.GDP.push({
+                    date: `${year}-Q${q+1}`,
+                    value: 26.95 + (year - startYear) * 0.5 + (Math.random() - 0.5) * 2
+                });
+            }
+        }
+        
+        console.log('GDP数据点数量:', data.GDP.length);
+        
+        // 生成股票数据
+        data.stocks = [];
+        const stockSymbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA'];
+        stockSymbols.forEach((symbol, i) => {
+            data.stocks.push({
+                symbol: symbol,
+                name: `Company ${i+1}`,
+                price: 100 + Math.random() * 200,
+                change: (Math.random() - 0.5) * 5
+            });
+        });
+        
+        console.log('股票数据:', data.stocks.length, '只股票');
+        
+        return data;
+    }
+    
+    // 显示数据
+    function displayData(data) {
+        const output = document.getElementById('output');
+        output.innerHTML = `
+            <h2>测试结果</h2>
+            <p>✅ JavaScript执行正常</p>
+            <p>✅ GDP数据点: ${data.GDP.length}</p>
+            <p>✅ 股票数量: ${data.stocks.length}</p>
+            <p>✅ 最新GDP: ${data.GDP[data.GDP.length-1].value.toFixed(2)} 万亿美元</p>
+        `;
+        
+        // 显示指标
+        const metrics = document.getElementById('metrics');
+        const currentGDP = data.GDP[data.GDP.length-1];
+        const prevGDP = data.GDP[data.GDP.length-2];
+        const change = ((currentGDP.value - prevGDP.value) / prevGDP.value * 100).toFixed(2);
+        
+        metrics.innerHTML = `
+            <h2>宏观指标</h2>
+            <div class="metric-card">
+                <div class="metric-title">美国GDP环比折年率</div>
+                <div class="metric-value">${currentGDP.value.toFixed(2)}<span class="unit">万亿美元</span></div>
+                <div class="metric-change ${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '↑' : '↓'} ${Math.abs(change)}%</div>
+            </div>
+        `;
+        
+        // 显示股票
+        const stocks = document.getElementById('stocks');
+        stocks.innerHTML = `
+            <h2>股票行情</h2>
+            <div class="stock-grid">
+                ${data.stocks.map(s => `
+                    <div class="stock-card">
+                        <div class="symbol">${s.symbol}</div>
+                        <div class="name">${s.name}</div>
+                        <div class="price">$${s.price.toFixed(2)}</div>
+                        <div class="change ${s.change >= 0 ? 'up' : 'down'}">${s.change >= 0 ? '+' : ''}${s.change.toFixed(2)}%</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        // 显示表格
+        const tables = document.getElementById('tables');
+        tables.innerHTML = `
+            <h2>经济数据明细</h2>
+            <table class="data-table">
+                <thead>
+                    <tr><th>指标</th><th>当前值</th><th>前值</th><th>变化</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>美国GDP</td><td>${currentGDP.value.toFixed(2)}万亿</td><td>${prevGDP.value.toFixed(2)}万亿</td><td class="${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '+' : ''}${change}%</td></tr>
+                </tbody>
+            </table>
+        `;
+        
+        console.log('数据展示完成');
+    }
+    
+    // 页面加载完成后执行
+    window.addEventListener('load', () => {
+        console.log('页面加载完成');
+        setTimeout(() => {
+            try {
+                const data = generateTestData();
+                displayData(data);
+                console.log('✅ 测试完成 - 所有功能正常');
+            } catch (error) {
+                console.error('❌ 错误:', error);
+                document.body.innerHTML += `<div style="color:red;padding:20px;">错误: ${error.message}</div>`;
+            }
+        }, 100);
+    });
+    
+    // 样式
+    document.body.style.cssText = 'font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;';
+    const style = document.createElement('style');
+    style.textContent = `
+        .metric-card { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0; }
+        .metric-title { color: #666; font-size: 12px; }
+        .metric-value { font-size: 24px; font-weight: bold; margin: 5px 0; }
+        .unit { font-size: 12px; color: #999; }
+        .metric-change { font-size: 14px; }
+        .up { color: green; }
+        .down { color: red; }
+        .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 10px 0; }
+        .stock-card { background: #f5f5f5; padding: 12px; border-radius: 8px; text-align: center; }
+        .symbol { font-weight: bold; }
+        .name { font-size: 12px; color: #666; }
+        .price { font-size: 18px; font-weight: bold; margin: 5px 0; }
+        .data-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        .data-table th, .data-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .data-table th { background: #f5f5f5; }
+    `;
+    document.head.appendChild(style);
+    </script>
+</body>
+</html>
