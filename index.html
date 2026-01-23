@@ -859,6 +859,15 @@
     </div>
 
     <script>
+        // 全局错误处理
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('JavaScript错误:', msg, '文件:', url, '行号:', line);
+            document.body.innerHTML += '<div style="color:red;padding:20px;background:#ffeeee;margin:10px;border-radius:5px;"><strong>JavaScript错误:</strong> ' + msg + '<br>行号: ' + line + '</div>';
+            return false;
+        };
+
+        console.log('开始加载宏观估值平台...');
+
         const CONFIG = {
             fred: {
                 baseUrl: 'https://api.stlouisfed.org/fred',
@@ -884,11 +893,22 @@
         let updateIntervals = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            initNavigation();
-            initCharts();
-            initTimeToggles();
-            loadData();
-            startUpdates();
+            console.log('DOM加载完成，开始初始化...');
+            try {
+                initNavigation();
+                console.log('导航初始化完成');
+                initCharts();
+                console.log('图表初始化完成');
+                initTimeToggles();
+                console.log('时间切换初始化完成');
+                loadData();
+                console.log('数据加载完成');
+                startUpdates();
+                console.log('实时更新已启动');
+            } catch (error) {
+                console.error('初始化错误:', error);
+                document.body.innerHTML += '<div style="color:red;padding:20px;background:#ffeeee;margin:10px;border-radius:5px;"><strong>初始化错误:</strong> ' + error.message + '</div>';
+            }
         });
 
         function initNavigation() {
