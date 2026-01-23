@@ -861,12 +861,9 @@
     <script>
         // 全局错误处理
         window.onerror = function(msg, url, line, col, error) {
-            console.error('JavaScript错误:', msg, '文件:', url, '行号:', line);
-            document.body.innerHTML += '<div style="color:red;padding:20px;background:#ffeeee;margin:10px;border-radius:5px;"><strong>JavaScript错误:</strong> ' + msg + '<br>行号: ' + line + '</div>';
+            document.body.innerHTML = '<div style="color:red;padding:20px;background:#ffeeee;margin:10px;border-radius:5px;"><strong>JavaScript错误:</strong> ' + msg + '<br>行号: ' + line + '</div>';
             return false;
         };
-
-        console.log('开始加载宏观估值平台...');
 
         const CONFIG = {
             fred: {
@@ -892,22 +889,15 @@
         };
         let updateIntervals = [];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM加载完成，开始初始化...');
+        document.addEventListener('DOMContentLoaded', function() {
             try {
                 initNavigation();
-                console.log('导航初始化完成');
                 initCharts();
-                console.log('图表初始化完成');
                 initTimeToggles();
-                console.log('时间切换初始化完成');
                 loadData();
-                console.log('数据加载完成');
                 startUpdates();
-                console.log('实时更新已启动');
             } catch (error) {
-                console.error('初始化错误:', error);
-                document.body.innerHTML += '<div style="color:red;padding:20px;background:#ffeeee;margin:10px;border-radius:5px;"><strong>初始化错误:</strong> ' + error.message + '</div>';
+                document.body.innerHTML = '<div style="color:red;padding:20px;background:#ffeeee;margin:10px;border-radius:5px;"><strong>初始化错误:</strong> ' + error.message + '</div>';
             }
         });
 
@@ -1004,14 +994,10 @@
         }
 
         function generate100YearData() {
-            console.log('开始生成100年历史数据...');
             const now = new Date();
             const startYear = now.getFullYear() - 100;
             
-            console.log('生成美国数据...');
             macroData.GDP = generateLongTermData('GDP', startYear, now.getFullYear(), 'quarterly');
-            console.log('GDP数据点:', macroData.GDP.length);
-            
             macroData.CPIAUCSL = generateLongTermData('CPI', startYear, now.getFullYear(), 'monthly');
             macroData.UNRATE = generateLongTermData('UNRATE', startYear, now.getFullYear(), 'monthly');
             macroData.FEDFUNDS = generateLongTermData('FEDFUNDS', startYear, now.getFullYear(), 'monthly');
@@ -1019,7 +1005,6 @@
             macroData.PPIACO = generateLongTermData('PPI', startYear, now.getFullYear(), 'monthly');
             macroData.DTWEXB = generateLongTermData('DXY', startYear, now.getFullYear(), 'daily');
             
-            console.log('生成中国数据...');
             const cnStartYear = 1985;
             macroData.CHINA_GDP = generateChinaLongTermData('GDP', cnStartYear, now.getFullYear());
             macroData.CHINA_CPI = generateChinaLongTermData('CPI', cnStartYear, now.getFullYear());
@@ -1028,10 +1013,7 @@
             macroData.CHINA_PPI = generateChinaLongTermData('PPI', cnStartYear, now.getFullYear());
             macroData.EXPORT = generateChinaLongTermData('EXPORT', cnStartYear, now.getFullYear());
             
-            console.log('生成估值历史数据...');
             macroData.PE_HISTORY = generatePeHistoryData(now.getFullYear() - 50, now.getFullYear());
-            console.log('PE历史数据点:', macroData.PE_HISTORY.length);
-            console.log('100年数据生成完成!');
         }
 
         function generateLongTermData(type, startYear, endYear, frequency) {
@@ -1150,12 +1132,10 @@
         }
 
         function generateStockData() {
-            console.log('开始生成股票数据...');
             const prices = { 'AAPL': 185.50, 'MSFT': 378.90, 'GOOGL': 141.80, 'AMZN': 178.25, 'NVDA': 495.20, 'META': 505.75, 'TSLA': 248.50, '600519.SS': 1700.00, '601398.SS': 5.80, '601288.SS': 4.20, '601988.SS': 3.80, '600036.SS': 35.50 };
             const names = { 'AAPL': 'Apple Inc.', 'MSFT': 'Microsoft', 'GOOGL': 'Alphabet', 'AMZN': 'Amazon', 'NVDA': 'NVIDIA', 'META': 'Meta Platforms', 'TSLA': 'Tesla', '600519.SS': '贵州茅台', '601398.SS': '工商银行', '601288.SS': '农业银行', '601988.SS': '中国银行', '600036.SS': '招商银行' };
             
-            Object.keys(prices).forEach(symbol => {
-                console.log('生成 ' + symbol + ' 数据...');
+            Object.keys(prices).forEach(function(symbol) {
                 const basePrice = prices[symbol];
                 const prices_history = [];
                 let price = basePrice * 0.6;
@@ -1173,7 +1153,6 @@
                 const change = ((currentPrice - prevClose) / prevClose * 100);
                 stockData[symbol] = { name: names[symbol], price: currentPrice, change: change, history: prices_history, pattern: detectPattern(prices_history) };
             });
-            console.log('股票数据生成完成! 共', Object.keys(stockData).length, '只股票');
         }
 
         function detectPattern(history) {
