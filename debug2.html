@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug v2 - Macro Platform</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+        --bg-main: #f8f9fc;
+        --bg-card: #ffffff;
+        --text-primary: #1a1a2e;
+        --text-secondary: #4a4a68;
+        --border: #e8e8f0;
+        --accent: #4f46e5;
+        --up: #10b981;
+        --down: #ef4444;
+    }
+    body { font-family: -apple-system, sans-serif; background: var(--bg-main); padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .card { background: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .card-title { font-size: 14px; font-weight: 600; }
+    .chart-box { height: 280px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
+    .metric-card { background: var(--bg-card); border-radius: 10px; padding: 14px; border: 1px solid var(--border); }
+    .metric-title { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+    .metric-value { font-size: 22px; font-weight: 700; color: var(--text-primary); margin: 6px 0; }
+    .metric-unit { font-size: 11px; color: #8888a0; margin-left: 2px; }
+    .metric-change { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+    .metric-arrow { font-weight: 700; }
+    .up { color: var(--up); }
+    .down { color: var(--down); }
+    .log { font-family: monospace; font-size: 11px; background: #1a1a2e; color: #0f0; padding: 15px; border-radius: 8px; white-space: pre-wrap; max-height: 300px; overflow: auto; }
+    .nav { display: flex; gap: 4px; background: var(--bg-card); padding: 6px; border-radius: 10px; margin-bottom: 16px; }
+    .nav-btn { padding: 10px 18px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--text-secondary); }
+    .nav-btn.active { background: var(--accent); color: white; }
+    .page { display: none; }
+    .page.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav">
+            <button class="nav-btn active" data-page="dashboard">仪表盘</button>
+            <button class="nav-btn" data-page="us-economy">美国经济</button>
+        </nav>
+        
+        <!-- Dashboard -->
+        <div id="dashboard" class="page active">
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-title">美国GDP环比折年率</div>
+                    <div class="metric-value" id="usGdp">--<span class="metric-unit">万亿美元</span></div>
+                    <div class="metric-change" id="usGdpChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">美国CPI同比</div>
+                    <div class="metric-value" id="usCpi">--<span class="metric-unit">%</span></div>
+                    <div class="metric-change" id="usCpiChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">联邦基金利率</div>
+                    <div class="metric-value" id="usFedRate">--<span class="metric-unit">%</span></div>
+                    <div class="metric-change" id="usFedRateChange">--</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">美国失业率</div>
+                    <div class="metric-value" id="usUnemployment">--<span class="metric-unit">%</span></div>
+                    <div class="metric-change" id="usUnemploymentChange">--</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">美国GDP vs CPI</div>
+                </div>
+                <div id="usGdpChart" class="chart-box"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">联邦基金利率 vs 失业率</div>
+                </div>
+                <div id="usFedChart" class="chart-box"></div>
+            </div>
+        </div>
+        
+        <!-- US Economy -->
+        <div id="us-economy" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">制造业PMI</div>
+                </div>
+                <div id="pmiChart" class="chart-box"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3 style="margin-bottom:10px;">诊断日志</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+    const logDiv = document.getElementById('log');
+    function log(msg, type) {
+        const time = new Date().toLocaleTimeString();
+        const cls = type === 'pass' ? 'color:#0f0' : (type === 'fail' ? 'color:#f55' : 'color:#fff');
+        logDiv.innerHTML += `[${time}] <span style="${cls}">${msg}</span>\n`;
+        console.log(`[${time}] ${msg}`);
+    }
+    
+    log('=== 完整诊断测试 v2 ===');
+    
+    // Variables
+    let macroData = {};
+    let charts = {};
+    
+    log('\n[1/6] 检查 ECharts...');
+    if (typeof echarts === 'undefined') {
+        log('❌ ECharts 未加载!', 'fail');
+    } else {
+        log(`✓ ECharts 版本: ${echarts.version}`, 'pass');
+    }
+    
+    log('\n[2/6] 生成完整测试数据...');
+    try {
+        // GDP (40 quarters = 10 years)
+        macroData.GDP = [];
+        for (let i = 0; i < 40; i++) {
+            const year = 2024 - Math.floor(i/4);
+            const quarter = 4 - (i % 4);
+            macroData.GDP.push({
+                date: `${year}-Q${quarter}`,
+                value: 26 + Math.random() * 2
+            });
+        }
+        log(`✓ GDP: ${macroData.GDP.length} 条数据`);
+        
+        // CPI (12 months)
+        macroData.CPIAUCSL = [];
+        for (let i = 0; i < 12; i++) {
+            macroData.CPIAUCSL.push({
+                date: '2024-' + (i+1).toString().padStart(2, '0'),
+                value: 310 + Math.random() * 10
+            });
+        }
+        log(`✓ CPI: ${macroData.CPIAUCSL.length} 条数据`);
+        
+        // Fed Rate (12 months)
+        macroData.FEDFUNDS = [];
+        let fedRate = 5.33;
+        for (let i = 0; i < 12; i++) {
+            fedRate = fedRate * (1 - 0.02) + Math.random() * 0.15;
+            fedRate = Math.max(3, Math.min(6, fedRate));
+            macroData.FEDFUNDS.push({
+                date: '2024-' + (i+1).toString().padStart(2, '0'),
+                value: parseFloat(fedRate.toFixed(2))
+            });
+        }
+        log(`✓ 联邦利率: ${macroData.FEDFUNDS.length} 条数据`);
+        
+        // Unemployment (12 months)
+        macroData.UNRATE = [];
+        let unemp = 3.7;
+        for (let i = 0; i < 12; i++) {
+            unemp = unemp + (Math.random() - 0.4) * 0.2;
+            unemp = Math.max(3, Math.min(6, unemp));
+            macroData.UNRATE.push({
+                date: '2024-' + (i+1).toString().padStart(2, '0'),
+                value: parseFloat(unemp.toFixed(1))
+            });
+        }
+        log(`✓ 失业率: ${macroData.UNRATE.length} 条数据`);
+        
+    } catch (e) {
+        log(`❌ 数据生成错误: ${e.message}`, 'fail');
+    }
+    
+    log('\n[3/6] 初始化图表...');
+    try {
+        const chartIds = ['usGdpChart', 'usFedChart', 'pmiChart'];
+        chartIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                charts[id] = echarts.init(el);
+                log(`✓ ${id} 初始化成功`);
+            } else {
+                log(`❌ ${id} 不存在!`, 'fail');
+            }
+        });
+    } catch (e) {
+        log(`❌ 图表初始化错误: ${e.message}`, 'fail');
+    }
+    
+    log('\n[4/6] 渲染图表...');
+    try {
+        // GDP Chart
+        if (charts.usGdpChart) {
+            const dates = macroData.GDP.map(d => d.date);
+            const values = macroData.GDP.map(d => d.value);
+            charts.usGdpChart.setOption({
+                title: { text: '美国GDP (测试数据)', left: 'center' },
+                tooltip: { trigger: 'axis' },
+                grid: { left: '12%', right: '8%', top: '10%', bottom: '15%' },
+                xAxis: { type: 'category', data: dates },
+                yAxis: { type: 'value', name: '万亿美元' },
+                series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#3b82f6' }, areaStyle: { color: 'rgba(59, 130, 246, 0.1)' } }]
+            });
+            log(`✓ GDP 图表渲染成功 (${values.length} 点)`);
+        }
+        
+        // Fed Rate Chart
+        if (charts.usFedChart) {
+            const dates = macroData.FEDFUNDS.map(d => d.date);
+            const values = macroData.FEDFUNDS.map(d => d.value);
+            charts.usFedChart.setOption({
+                title: { text: '联邦基金利率 (测试数据)', left: 'center' },
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: dates },
+                yAxis: { type: 'value', name: '%' },
+                series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#8b5cf6' }, areaStyle: { color: 'rgba(139, 92, 246, 0.1)' } }]
+            });
+            log(`✓ 联邦利率图表渲染成功`);
+        }
+    } catch (e) {
+        log(`❌ 图表渲染错误: ${e.message}`, 'fail');
+    }
+    
+    log('\n[5/6] 更新所有指标卡片...');
+    try {
+        // GDP
+        const gdpCur = macroData.GDP[macroData.GDP.length - 1];
+        const gdpPrev = macroData.GDP[macroData.GDP.length - 2];
+        if (gdpCur && gdpPrev) {
+            const gdpChange = ((gdpCur.value - gdpPrev.value) / gdpPrev.value * 100).toFixed(2);
+            document.getElementById('usGdp').innerHTML = gdpCur.value.toFixed(2) + '<span class="metric-unit">万亿美元</span>';
+            document.getElementById('usGdpChange').innerHTML = `<span class="${gdpChange >= 0 ? 'up' : 'down'}">${gdpChange >= 0 ? '↑' : '↓'} ${Math.abs(gdpChange)}%</span>`;
+            log(`✓ GDP: ${gdpCur.value.toFixed(2)} (${gdpChange}%)`);
+        }
+        
+        // CPI
+        const cpiCur = macroData.CPIAUCSL[macroData.CPIAUCSL.length - 1];
+        const cpiPrev = macroData.CPIAUCSL[macroData.CPIAUCSL.length - 2];
+        if (cpiCur && cpiPrev) {
+            const cpiChange = ((cpiCur.value - cpiPrev.value) / cpiPrev.value * 100).toFixed(2);
+            document.getElementById('usCpi').innerHTML = cpiCur.value.toFixed(1) + '<span class="metric-unit">%</span>';
+            document.getElementById('usCpiChange').innerHTML = `<span class="${cpiChange >= 0 ? 'up' : 'down'}">${cpiChange >= 0 ? '↑' : '↓'} ${Math.abs(cpiChange)}%</span>`;
+            log(`✓ CPI: ${cpiCur.value.toFixed(1)}% (${cpiChange}%)`);
+        }
+        
+        // Fed Rate
+        const fedCur = macroData.FEDFUNDS[macroData.FEDFUNDS.length - 1];
+        const fedPrev = macroData.FEDFUNDS[macroData.FEDFUNDS.length - 2];
+        if (fedCur && fedPrev) {
+            const fedChange = ((fedCur.value - fedPrev.value) / fedPrev.value * 100).toFixed(2);
+            document.getElementById('usFedRate').innerHTML = fedCur.value.toFixed(2) + '<span class="metric-unit">%</span>';
+            document.getElementById('usFedRateChange').innerHTML = `<span class="${fedChange >= 0 ? 'up' : 'down'}">${fedChange >= 0 ? '↑' : '↓'} ${Math.abs(fedChange)}%</span>`;
+            log(`✓ 联邦利率: ${fedCur.value.toFixed(2)}% (${fedChange}%)`);
+        }
+        
+        // Unemployment
+        const unempCur = macroData.UNRATE[macroData.UNRATE.length - 1];
+        const unempPrev = macroData.UNRATE[macroData.UNRATE.length - 2];
+        if (unempCur && unempPrev) {
+            const unempChange = ((unempCur.value - unempPrev.value) / unempPrev.value * 100).toFixed(2);
+            document.getElementById('usUnemployment').innerHTML = unempCur.value.toFixed(1) + '<span class="metric-unit">%</span>';
+            document.getElementById('usUnemploymentChange').innerHTML = `<span class="${unempChange >= 0 ? 'down' : 'up'}">${unempChange >= 0 ? '↑' : '↓'} ${Math.abs(unempChange)}%</span>`;
+            log(`✓ 失业率: ${unempCur.value.toFixed(1)}% (${unempChange}%)`);
+        }
+        
+    } catch (e) {
+        log(`❌ 指标更新错误: ${e.message}`, 'fail');
+    }
+    
+    log('\n[6/6] 完成!');
+    log('\n=== 诊断测试完成 ===');
+    </script>
+</body>
+</html>

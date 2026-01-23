@@ -14,6 +14,8 @@
         --text-muted: #8888a0;
         --border: #e8e8f0;
         --accent: #4f46e5;
+        --us-color: #3b82f6;
+        --cn-color: #ef4444;
         --up: #10b981;
         --down: #ef4444;
     }
@@ -26,6 +28,7 @@
     }
     .container { max-width: 1400px; margin: 0 auto; padding: 16px; }
     
+    /* Header */
     .header {
         background: var(--bg-card);
         padding: 12px 24px;
@@ -37,6 +40,7 @@
     }
     .logo { font-size: 18px; font-weight: 700; color: var(--accent); }
     
+    /* Navigation */
     .nav {
         display: flex;
         gap: 4px;
@@ -60,9 +64,11 @@
     .nav-btn:hover { background: var(--bg-main); }
     .nav-btn.active { background: var(--accent); color: white; }
     
+    /* Pages */
     .page { display: none; }
     .page.active { display: block; }
     
+    /* Cards */
     .card {
         background: var(--bg-card);
         border-radius: 12px;
@@ -81,6 +87,7 @@
     }
     .card-title { font-size: 14px; font-weight: 600; }
     
+    /* Metrics Grid */
     .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
     .metric-card {
         background: var(--bg-card);
@@ -97,9 +104,11 @@
     .up { color: var(--up); }
     .down { color: var(--down); }
     
+    /* Charts */
     .chart-box { height: 280px; }
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 16px; }
     
+    /* Log Panel */
     .log-panel {
         background: #1a1a2e;
         color: #0f0;
@@ -123,12 +132,14 @@
     </div>
     
     <div class="container">
+        <!-- Navigation -->
         <nav class="nav">
             <button class="nav-btn active" data-page="dashboard">仪表盘</button>
             <button class="nav-btn" data-page="us-economy">美国经济</button>
             <button class="nav-btn" data-page="cn-economy">中国经济</button>
         </nav>
         
+        <!-- Dashboard Page -->
         <div id="dashboard" class="page active">
             <div class="grid-4">
                 <div class="metric-card">
@@ -169,6 +180,7 @@
             </div>
         </div>
         
+        <!-- US Economy Page -->
         <div id="us-economy" class="page">
             <div class="card">
                 <div class="card-header">
@@ -184,6 +196,7 @@
             </div>
         </div>
         
+        <!-- China Economy Page -->
         <div id="cn-economy" class="page">
             <div class="card">
                 <div class="card-header">
@@ -193,6 +206,7 @@
             </div>
         </div>
         
+        <!-- Diagnostic Log -->
         <div class="card">
             <div class="card-header">
                 <div class="card-title">🔍 诊断日志</div>
@@ -202,41 +216,47 @@
     </div>
 
     <script>
+    // Logging system
     const logDiv = document.getElementById('log');
     function log(msg, type) {
         const time = new Date().toLocaleTimeString();
         const cls = type === 'pass' ? 'log-pass' : (type === 'fail' ? 'log-fail' : '');
-        logDiv.innerHTML += '[' + time + '] <span class="' + cls + '">' + msg + '</span>\n';
-        console.log('[' + time + '] ' + msg);
+        logDiv.innerHTML += `[${time}] <span class="${cls}">${msg}</span>\n`;
     }
     
+    // Global variables
     let macroData = {};
     let charts = {};
     let currentPage = 'dashboard';
     
+    // Initialize
     log('=== 宏观估值平台启动 ===');
     log('');
     
+    // Check ECharts
     log('[1/5] 检查 ECharts 库...');
     if (typeof echarts === 'undefined') {
         log('❌ ECharts 未加载!', 'fail');
     } else {
-        log('✓ ECharts 版本: ' + echarts.version, 'pass');
+        log(`✓ ECharts 版本: ${echarts.version}`, 'pass');
     }
     
+    // Generate data
     log('[2/5] 生成宏观数据...');
     try {
+        // GDP data (40 quarters)
         macroData.GDP = [];
         for (let i = 0; i < 40; i++) {
             const year = 2024 - Math.floor(i/4);
             const quarter = 4 - (i % 4);
             macroData.GDP.push({
-                date: year + '-Q' + quarter,
+                date: `${year}-Q${quarter}`,
                 value: 26 + Math.random() * 2
             });
         }
-        log('✓ GDP: ' + macroData.GDP.length + ' 条数据');
+        log(`✓ GDP: ${macroData.GDP.length} 条数据`);
         
+        // CPI data (12 months)
         macroData.CPIAUCSL = [];
         for (let i = 0; i < 12; i++) {
             macroData.CPIAUCSL.push({
@@ -244,8 +264,9 @@
                 value: 310 + Math.random() * 10
             });
         }
-        log('✓ CPI: ' + macroData.CPIAUCSL.length + ' 条数据');
+        log(`✓ CPI: ${macroData.CPIAUCSL.length} 条数据`);
         
+        // Fed Rate (12 months)
         macroData.FEDFUNDS = [];
         let fedRate = 5.33;
         for (let i = 0; i < 12; i++) {
@@ -256,8 +277,9 @@
                 value: parseFloat(fedRate.toFixed(2))
             });
         }
-        log('✓ 联邦利率: ' + macroData.FEDFUNDS.length + ' 条数据');
+        log(`✓ 联邦利率: ${macroData.FEDFUNDS.length} 条数据`);
         
+        // Unemployment (12 months)
         macroData.UNRATE = [];
         let unemp = 3.7;
         for (let i = 0; i < 12; i++) {
@@ -268,20 +290,22 @@
                 value: parseFloat(unemp.toFixed(1))
             });
         }
-        log('✓ 失业率: ' + macroData.UNRATE.length + ' 条数据');
+        log(`✓ 失业率: ${macroData.UNRATE.length} 条数据`);
         
+        // PMI (12 months)
         macroData.MANEMP = [];
         let pmi = 49;
         for (let i = 0; i < 12; i++) {
             pmi = pmi + (Math.random() - 0.45) * 2;
-            pmi = Math.max(45, Math.min(55, pmi));
+            pmi = Math.max(45, Math.max(55, pmi));
             macroData.MANEMP.push({
                 date: '2024-' + (i+1).toString().padStart(2, '0'),
                 value: parseFloat(pmi.toFixed(1))
             });
         }
-        log('✓ PMI: ' + macroData.MANEMP.length + ' 条数据');
+        log(`✓ PMI: ${macroData.MANEMP.length} 条数据`);
         
+        // DXY (12 months)
         macroData.DTWEXB = [];
         let dxy = 103.5;
         for (let i = 0; i < 12; i++) {
@@ -292,33 +316,36 @@
                 value: parseFloat(dxy.toFixed(2))
             });
         }
-        log('✓ 美元指数: ' + macroData.DTWEXB.length + ' 条数据');
+        log(`✓ 美元指数: ${macroData.DTWEXB.length} 条数据`);
         
     } catch (e) {
-        log('❌ 数据生成错误: ' + e.message, 'fail');
+        log(`❌ 数据生成错误: ${e.message}`, 'fail');
     }
     
+    // Initialize charts
     log('[3/5] 初始化图表...');
     try {
         const chartIds = ['usGdpChart', 'usFedChart', 'pmiChart', 'dxyChart', 'cnChart'];
-        chartIds.forEach(function(id) {
+        chartIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 charts[id] = echarts.init(el);
-                log('✓ ' + id + ' 初始化成功');
+                log(`✓ ${id} 初始化成功`);
             } else {
-                log('❌ ' + id + ' 不存在!', 'fail');
+                log(`❌ ${id} 不存在!`, 'fail');
             }
         });
     } catch (e) {
-        log('❌ 图表初始化错误: ' + e.message, 'fail');
+        log(`❌ 图表初始化错误: ${e.message}`, 'fail');
     }
     
+    // Render charts
     log('[4/5] 渲染图表...');
     try {
+        // GDP Chart
         if (charts.usGdpChart) {
-            const dates = macroData.GDP.map(function(d) { return d.date; });
-            const values = macroData.GDP.map(function(d) { return d.value; });
+            const dates = macroData.GDP.map(d => d.date);
+            const values = macroData.GDP.map(d => d.value);
             charts.usGdpChart.setOption({
                 title: { text: '美国GDP环比折年率', left: 'center' },
                 tooltip: { trigger: 'axis' },
@@ -327,12 +354,13 @@
                 yAxis: { type: 'value', name: '万亿美元' },
                 series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#3b82f6' }, areaStyle: { color: 'rgba(59, 130, 246, 0.1)' } }]
             });
-            log('✓ GDP 图表渲染成功 (' + values.length + ' 点)');
+            log(`✓ GDP 图表渲染成功 (${values.length} 点)`);
         }
         
+        // Fed Rate Chart
         if (charts.usFedChart) {
-            const dates = macroData.FEDFUNDS.map(function(d) { return d.date; });
-            const values = macroData.FEDFUNDS.map(function(d) { return d.value; });
+            const dates = macroData.FEDFUNDS.map(d => d.date);
+            const values = macroData.FEDFUNDS.map(d => d.value);
             charts.usFedChart.setOption({
                 title: { text: '联邦基金利率 (%)', left: 'center' },
                 tooltip: { trigger: 'axis' },
@@ -340,12 +368,13 @@
                 yAxis: { type: 'value', name: '%' },
                 series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#8b5cf6' }, areaStyle: { color: 'rgba(139, 92, 246, 0.1)' } }]
             });
-            log('✓ 联邦利率图表渲染成功');
+            log(`✓ 联邦利率图表渲染成功`);
         }
         
+        // PMI Chart
         if (charts.pmiChart) {
-            const dates = macroData.MANEMP.map(function(d) { return d.date; });
-            const values = macroData.MANEMP.map(function(d) { return d.value; });
+            const dates = macroData.MANEMP.map(d => d.date);
+            const values = macroData.MANEMP.map(d => d.value);
             charts.pmiChart.setOption({
                 title: { text: '制造业PMI', left: 'center' },
                 tooltip: { trigger: 'axis' },
@@ -353,12 +382,13 @@
                 yAxis: { type: 'value', min: 45, max: 55 },
                 series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#3b82f6' }, markLine: { silent: true, data: [{ yAxis: 50, lineStyle: { color: '#10b981' } }] } }]
             });
-            log('✓ PMI 图表渲染成功');
+            log(`✓ PMI 图表渲染成功`);
         }
         
+        // DXY Chart
         if (charts.dxyChart) {
-            constdates = macroData.DTWEXB.map(function(d) { return d.date; });
-            const values = macroData.DTWEXB.map(function(d) { return d.value; });
+            const dates = macroData.DTWEXB.map(d => d.date);
+            const values = macroData.DTWEXB.map(d => d.value);
             charts.dxyChart.setOption({
                 title: { text: '美元指数DXY', left: 'center' },
                 tooltip: { trigger: 'axis' },
@@ -366,105 +396,114 @@
                 yAxis: { type: 'value' },
                 series: [{ type: 'line', smooth: true, data: values, lineStyle: { width: 2, color: '#ef4444' }, areaStyle: { color: 'rgba(239, 68, 68, 0.1)' } }]
             });
-            log('✓ 美元指数图表渲染成功');
+            log(`✓ 美元指数图表渲染成功`);
         }
         
+        // China Chart
         if (charts.cnChart) {
-            const cnData = macroData.CPIAUCSL.slice(-6).map(function(d, i) {
-                return {
-                    date: d.date,
-                    cpi: d.value,
-                    ppi: 98 + Math.random() * 5
-                };
-            });
+            const cnData = macroData.CPIAUCSL.slice(-6).map((d, i) => ({
+                date: d.date,
+                cpi: d.value,
+                ppi: 98 + Math.random() * 5
+            }));
             charts.cnChart.setOption({
                 title: { text: '中国CPI vs PPI', left: 'center' },
                 tooltip: { trigger: 'axis' },
-                xAxis: { type: 'category', data: cnData.map(function(d) { return d.date; }) },
+                xAxis: { type: 'category', data: cnData.map(d => d.date) },
                 yAxis: { type: 'value' },
                 series: [
-                    { name: 'CPI', type: 'line', data: cnData.map(function(d) { return d.cpi; }), lineStyle: { color: '#ef4444' } },
-                    { name: 'PPI', type: 'line', data: cnData.map(function(d) { return d.ppi; }), lineStyle: { color: '#f59e0b' } }
+                    { name: 'CPI', type: 'line', data: cnData.map(d => d.cpi), lineStyle: { color: '#ef4444' } },
+                    { name: 'PPI', type: 'line', data: cnData.map(d => d.ppi), lineStyle: { color: '#f59e0b' } }
                 ]
             });
-            log('✓ 中国经济图表渲染成功');
+            log(`✓ 中国经济图表渲染成功`);
         }
         
     } catch (e) {
-        log('❌ 图表渲染错误: ' + e.message, 'fail');
+        log(`❌ 图表渲染错误: ${e.message}`, 'fail');
     }
     
+    // Update metric cards
     log('[5/5] 更新指标卡片...');
     try {
+        // GDP
         const gdpCur = macroData.GDP[macroData.GDP.length - 1];
         const gdpPrev = macroData.GDP[macroData.GDP.length - 2];
         if (gdpCur && gdpPrev) {
             const change = ((gdpCur.value - gdpPrev.value) / gdpPrev.value * 100).toFixed(2);
             document.getElementById('usGdp').innerHTML = gdpCur.value.toFixed(2) + '<span class="metric-unit">万亿美元</span>';
-            document.getElementById('usGdpChange').innerHTML = '<span class="' + (change >= 0 ? 'up' : 'down') + '">' + (change >= 0 ? '↑' : '↓') + ' ' + Math.abs(change) + '%</span>';
-            log('✓ GDP: ' + gdpCur.value.toFixed(2));
+            document.getElementById('usGdpChange').innerHTML = `<span class="${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '↑' : '↓'} ${Math.abs(change)}%</span>`;
+            log(`✓ GDP: ${gdpCur.value.toFixed(2)}`);
         }
         
+        // CPI
         const cpiCur = macroData.CPIAUCSL[macroData.CPIAUCSL.length - 1];
         const cpiPrev = macroData.CPIAUCSL[macroData.CPIAUCSL.length - 2];
         if (cpiCur && cpiPrev) {
             const change = ((cpiCur.value - cpiPrev.value) / cpiPrev.value * 100).toFixed(2);
             document.getElementById('usCpi').innerHTML = cpiCur.value.toFixed(1) + '<span class="metric-unit">%</span>';
-            document.getElementById('usCpiChange').innerHTML = '<span class="' + (change >= 0 ? 'up' : 'down') + '">' + (change >= 0 ? '↑' : '↓') + ' ' + Math.abs(change) + '%</span>';
-            log('✓ CPI: ' + cpiCur.value.toFixed(1) + '%');
+            document.getElementById('usCpiChange').innerHTML = `<span class="${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '↑' : '↓'} ${Math.abs(change)}%</span>`;
+            log(`✓ CPI: ${cpiCur.value.toFixed(1)}%`);
         }
         
+        // Fed Rate
         const fedCur = macroData.FEDFUNDS[macroData.FEDFUNDS.length - 1];
         const fedPrev = macroData.FEDFUNDS[macroData.FEDFUNDS.length - 2];
         if (fedCur && fedPrev) {
             const change = ((fedCur.value - fedPrev.value) / fedPrev.value * 100).toFixed(2);
             document.getElementById('usFedRate').innerHTML = fedCur.value.toFixed(2) + '<span class="metric-unit">%</span>';
-            document.getElementById('usFedRateChange').innerHTML = '<span class="' + (change >= 0 ? 'up' : 'down') + '">' + (change >= 0 ? '↑' : '↓') + ' ' + Math.abs(change) + '%</span>';
-            log('✓ 联邦利率: ' + fedCur.value.toFixed(2) + '%');
+            document.getElementById('usFedRateChange').innerHTML = `<span class="${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '↑' : '↓'} ${Math.abs(change)}%</span>`;
+            log(`✓ 联邦利率: ${fedCur.value.toFixed(2)}%`);
         }
         
+        // Unemployment
         const unempCur = macroData.UNRATE[macroData.UNRATE.length - 1];
         const unempPrev = macroData.UNRATE[macroData.UNRATE.length - 2];
         if (unempCur && unempPrev) {
-            const change = ((unempCur.value - unempPrev.value) / unempPrev.value * 100).toFixed(2);
-            document.getElementById('usUnemployment').innerHTML = unempCur.value.toFixed(1) + '<span class="metric-unit">%</span>';
-            document.getElementById('usUnemploymentChange').innerHTML = '<span class="' + (change >= 0 ? 'down' : 'up') + '">' + (change >= 0 ? '↑' : '↓') + ' ' + Math.abs(change) + '%</span>';
-            log('✓ 失业率: ' + unempCur.value.toFixed(1) + '%');
+            const change = ((unempCur.value -) / unempPrev.value * 100).toFixed(2);
+            unempPrev.value document.getElementById('usUnemployment').innerHTML = unempCur.value.toFixed(1) + '<span class="metric-unit">%</span>';
+            document.getElementById('usUnemploymentChange').innerHTML = `<span class="${change >= 0 ? 'down' : 'up'}">${change >= 0 ? '↑' : '↓'} ${Math.abs(change)}%</span>`;
+            log(`✓ 失业率: ${unempCur.value.toFixed(1)}%`);
         }
         
     } catch (e) {
-        log('❌ 指标更新错误: ' + e.message, 'fail');
+        log(`❌ 指标更新错误: ${e.message}`, 'fail');
     }
     
+    // Navigation
     log('');
     log('初始化页面切换功能...');
     try {
-        document.querySelectorAll('.nav-btn').forEach(function(btn) {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const page = this.dataset.page;
                 if (page === currentPage) return;
                 
-                document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+                // Update buttons
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 
-                document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+                // Update pages
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 document.getElementById(page).classList.add('active');
                 
-                setTimeout(function() {
-                    Object.values(charts).forEach(function(chart) { if (chart) chart.resize(); });
+                // Resize charts
+                setTimeout(() => {
+                    Object.values(charts).forEach(chart => chart && chart.resize());
                 }, 100);
                 
                 currentPage = page;
-                log('切换到: ' + page);
+                log(`切换到: ${page}`);
             });
         });
-        log('✓ 页面切换功能正常', 'pass');
+        log('✓ 页面切换功能正常');
     } catch (e) {
-        log('❌ 页面切换错误: ' + e.message, 'fail');
+        log(`❌ 页面切换错误: ${e.message}`, 'fail');
     }
     
-    window.addEventListener('resize', function() {
-        Object.values(charts).forEach(function(chart) { if (chart) chart.resize(); });
+    // Window resize
+    window.addEventListener('resize', () => {
+        Object.values(charts).forEach(chart => chart && chart.resize());
     });
     
     log('');

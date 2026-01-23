@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Quick Test - Macro Platform</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    .test-box { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    h2 { color: #333; margin-bottom: 15px; }
+    .chart { width: 100%; height: 250px; margin: 10px 0; border: 1px solid #e0e0e0; border-radius: 4px; }
+    .log { font-family: monospace; font-size: 12px; background: #1a1a2e; color: #0f0; padding: 15px; border-radius: 8px; white-space: pre-wrap; max-height: 200px; overflow: auto; }
+    .pass { color: #10b981; }
+    .fail { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h2>📊 图表容器测试</h2>
+        <div id="usGdpChart" class="chart"></div>
+        <div id="usFedChart" class="chart"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>📋 诊断日志</h2>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+    function log(msg, type) {
+        const logDiv = document.getElementById('log');
+        const timestamp = new Date().toLocaleTimeString();
+        const className = type === 'pass' ? 'pass' : (type === 'fail' ? 'fail' : '');
+        logDiv.innerHTML += `[${timestamp}] <span class="${className}">${msg}</span>\n`;
+    }
+    
+    log('=== 快速诊断测试 ===');
+    
+    // Test 1: ECharts
+    log('\n1. 检查 ECharts 库...');
+    if (typeof echarts !== 'undefined') {
+        log('✓ ECharts 已加载 (版本: ' + echarts.version + ')', 'pass');
+    } else {
+        log('✗ ECharts 未加载!', 'fail');
+    }
+    
+    // Test 2: Containers
+    log('\n2. 检查图表容器...');
+    const containers = ['usGdpChart', 'usFedChart'];
+    containers.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            log(`✓ ${id} 存在`, 'pass');
+        } else {
+            log(`✗ ${id} 不存在!`, 'fail');
+        }
+    });
+    
+    // Test 3: Create Charts
+    log('\n3. 创建图表...');
+    try {
+        const chart1 = echarts.init(document.getElementById('usGdpChart'));
+        chart1.setOption({
+            title: { text: '美国GDP vs CPI', left: 'center' },
+            tooltip: { trigger: 'axis' },
+            xAxis: { type: 'category', data: ['Q1', 'Q2', 'Q3', 'Q4'] },
+            yAxis: { type: 'value' },
+            series: [{ data: [2.8, 3.1, 2.9, 3.2], type: 'line', smooth: true }]
+        });
+        log('✓ usGdpChart 图表创建成功', 'pass');
+        
+        const chart2 = echarts.init(document.getElementById('usFedChart'));
+        chart2.setOption({
+            title: { text: '联邦基金利率', left: 'center' },
+            xAxis: { type: 'category', data: ['Q1', 'Q2', 'Q3', 'Q4'] },
+            yAxis: { type: 'value' },
+            series: [{ data: [5.33, 5.25, 5.00, 4.75], type: 'line', smooth: true }]
+        });
+        log('✓ usFedChart 图表创建成功', 'pass');
+        
+    } catch (e) {
+        log('✗ 错误: ' + e.message, 'fail');
+    }
+    
+    // Test 4: Data
+    log('\n4. 测试数据生成...');
+    try {
+        const testData = [];
+        for (let i = 0; i < 4; i++) {
+            testData.push({ date: '2024-Q' + (i+1), value: Math.random() * 10 + 2 });
+        }
+        log(`✓ 生成 ${testData.length} 个数据点`, 'pass');
+        log('  示例: ' + JSON.stringify(testData[0]));
+    } catch (e) {
+        log('✗ 数据生成错误: ' + e.message, 'fail');
+    }
+    
+    log('\n=== 测试完成 ===');
+    </script>
+</body>
+</html>
