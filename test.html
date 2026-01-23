@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test - Macro Platform</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+</head>
+<body>
+    <h1>Test Page</h1>
+    <div id="chart1" style="width:600px;height:400px;border:1px solid #ccc;"></div>
+    <div id="status"></div>
+    
+    <script>
+    document.getElementById('status').innerHTML = 'Step 1: Script loaded<br>';
+    
+    try {
+        document.getElementById('status').innerHTML += 'Step 2: Checking ECharts...<br>';
+        
+        if (typeof echarts !== 'undefined') {
+            document.getElementById('status').innerHTML += 'Step 3: ECharts OK, creating chart...<br>';
+            
+            var chart = echarts.init(document.getElementById('chart1'));
+            var option = {
+                title: { text: 'Test Chart' },
+                xAxis: { type: 'category', data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] },
+                yAxis: { type: 'value' },
+                series: [{ data: [150, 230, 224, 218, 135], type: 'line' }]
+            };
+            chart.setOption(option);
+            document.getElementById('status').innerHTML += '✅ <b>SUCCESS!</b> Chart rendered!';
+        } else {
+            document.getElementById('status').innerHTML += '❌ ECharts not loaded!';
+        }
+    } catch (e) {
+        document.getElementById('status').innerHTML += '❌ Error: ' + e.message;
+    }
+    </script>
+</body>
+</html>
