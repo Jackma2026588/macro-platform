@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Detailed Test</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+</head>
+<body>
+    <h1>Detailed Diagnostic Test</h1>
+    <div id="test1" style="width:600px;height:300px;border:1px solid #ccc;margin:10px 0;"></div>
+    <div id="test2" style="width:600px;height:300px;border:1px solid #ccc;margin:10px 0;"></div>
+    <div id="log" style="font-family:monospace;font-size:12px;white-space:pre-wrap;background:#f5f5f5;padding:10px;max-height:300px;overflow:auto;"></div>
+    
+    <script>
+    function log(msg) {
+        document.getElementById('log').innerHTML += msg + '\n';
+    }
+    
+    log('=== Test Starting ===');
+    
+    // Test 1: Check if chart container exists
+    log('\n1. Checking chart containers...');
+    const containers = ['usGdpChart', 'usFedChart', 'pmiChart', 'dxyChart', 'cnMacroChart', 'peChart'];
+    containers.forEach(id => {
+        const el = document.getElementById(id);
+        log(`   ${id}: ${el ? '✓ Found' : '✗ NOT FOUND'}`);
+    });
+    
+    // Test 2: Try to create a chart in existing container
+    log('\n2. Testing chart creation...');
+    const testChart = document.getElementById('usGdpChart');
+    if (testChart) {
+        try {
+            const chart = echarts.init(testChart);
+            log('   ✓ usGdpChart initialized successfully');
+            
+            chart.setOption({
+                title: { text: 'Test - GDP Chart' },
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'category', data: ['2024-Q1', '2024-Q2', '2024-Q3', '2024-Q4'] },
+                yAxis: { type: 'value', name: 'GDP Growth (%)' },
+                series: [{ 
+                    data: [2.8, 3.1, 2.9, 3.2], 
+                    type: 'line',
+                    smooth: true,
+                    lineStyle: { width: 2, color: '#3b82f6' }
+                }]
+            });
+            log('   ✓ Chart option set successfully');
+        } catch (e) {
+            log('   ✗ Error: ' + e.message);
+        }
+    }
+    
+    // Test 3: Generate test data
+    log('\n3. Testing data generation...');
+    try {
+        const testData = [];
+        for (let i = 0; i < 10; i++) {
+            testData.push({ date: `202${i}`, value: Math.random() * 100 });
+        }
+        log(`   ✓ Generated ${testData.length} data points`);
+        log('   Sample: ' + JSON.stringify(testData.slice(0, 2)));
+    } catch (e) {
+        log('   ✗ Error: ' + e.message);
+    }
+    
+    // Test 4: Test chart with generated data
+    log('\n4. Testing chart with dynamic data...');
+    const testChart2 = document.getElementById('usFedChart');
+    if (testChart2) {
+        try {
+            const chart2 = echarts.init(testChart2);
+            const chart2Option = {
+                title: { text: 'Test - Generated Data' },
+                xAxis: { type: 'category', data: testData.map(d => d.date) },
+                yAxis: { type: 'value' },
+                series: [{ data: testData.map(d => d.value), type: 'line' }]
+            };
+            chart2.setOption(chart2Option);
+            log('   ✓ Chart with dynamic data created');
+        } catch (e) {
+            log('   ✗ Error: ' + e.message);
+        }
+    }
+    
+    log('\n=== Test Complete ===');
+    </script>
+</body>
+</html>
